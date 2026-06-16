@@ -15,6 +15,14 @@ AutoIntro analyzes a local code repository and generates a professional intro vi
 
 The result: a compelling visual narrative of your project's core flow, ready for docs, README, social, or product pages.
 
+## Demo
+
+Watch AutoIntro's own intro video (made with AutoIntro):
+
+[![AutoIntro demo video](https://img.youtube.com/vi/hAz_g459Abg/maxresdefault.jpg)](https://www.youtube.com/watch?v=hAz_g459Abg)
+
+▶️ **[Watch on YouTube](https://www.youtube.com/watch?v=hAz_g459Abg)**
+
 ## Quick Start
 
 ### Prerequisites
