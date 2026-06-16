@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "title": "Hydra", "fps": 30, "width": 1920, "height": 1080,
+    "theme": "cinematic-dark", "accent": "#2dd4bf", "accent2": "#f59e0b", "totalSeconds": 46,
+    "design": {
+      "mode": "dark", "glass": true, "radius": 16, "font": "Inter",
+      "palette": { "bg": "#07140f", "surface": "#0f241c", "text": "#eaf5ef", "dim": "#8fb3a4", "accent": "#2dd4bf", "accent2": "#f59e0b" }
+    }
+  },
+  "scenes": [
+    { "type": "title", "durationInFrames": 110, "transitionIn": "fade", "text": "Your data, in flow.", "sub": "Hydra · realtime analytics workspace" },
+
+    { "type": "problem", "durationInFrames": 110, "lines": ["Dashboards are static and slow.", "Insights arrive a day too late."] },
+
+    { "type": "ui-bento", "durationInFrames": 230, "transitionIn": "fade", "cols": 2,
+      "caption": "one live workspace",
+      "sidebar": { "items": [
+        { "icon": "LayoutDashboard", "label": "Overview" },
+        { "icon": "TrendingUp", "label": "Analytics" },
+        { "icon": "MessageSquare", "label": "Assistant" },
+        { "icon": "Settings", "label": "Settings" }
+      ], "active": 1 },
+      "tiles": [
+        { "primitive": "stat-tile", "props": { "label": "Active users", "value": 12480, "delta": "+18%" } },
+        { "primitive": "stat-tile", "props": { "label": "Revenue", "value": 92, "suffix": "k", "delta": "+7%" } },
+        { "primitive": "donut-chart", "props": { "percent": 72, "label": "of goal" } },
+        { "primitive": "line-chart", "props": { "values": [20, 35, 28, 50, 42, 68, 60] } }
+      ] },
+
+    { "type": "feature-montage", "durationInFrames": 200, "perItemFrames": 40,
+      "items": [
+        { "icon": "Search", "text": "Smart search" },
+        { "icon": "Zap", "text": "Instant sync" },
+        { "icon": "Shield", "text": "Private by default" },
+        { "icon": "TrendingUp", "text": "Live insights" },
+        { "icon": "Bell", "text": "Smart alerts" }
+      ] },
+
+    { "type": "ui-showcase", "durationInFrames": 210, "transitionIn": "slide",
+      "caption": "ask, and it answers",
+      "sidebar": { "items": [
+        { "icon": "LayoutDashboard", "label": "Overview" },
+        { "icon": "MessageSquare", "label": "Assistant" },
+        { "icon": "Folder", "label": "Reports" }
+      ], "active": 1 },
+      "element": { "primitive": "chat-bubble", "props": {
+        "from": "ai", "typing": true, "text": "Revenue is up 7% this week — top driver: the Pro plan.",
+        "bullets": ["Pro upgrades +24%", "Churn down to 1.8%", "3 enterprise leads"] } } },
+
+    { "type": "techstack", "durationInFrames": 130, "caption": "built with",
+      "items": [ { "name": "Next.js" }, { "name": "TypeScript" }, { "name": "Tailwind CSS" }, { "name": "PostgreSQL" }, { "name": "React" } ] },
+
+    { "type": "stat", "durationInFrames": 100, "value": "100ms", "label": "realtime updates", "sub": "no refresh, ever" },
+
+    { "type": "ui-sequence", "durationInFrames": 180,
+      "caption": "from query to insight",
+      "steps": [
+        { "primitive": "input-field", "props": { "query": "show churn by plan", "placeholder": "Ask Hydra…" } },
+        { "primitive": "bar-chart", "props": { "values": [40, 28, 16, 9] } }
+      ] },
+
+    { "type": "outro", "durationInFrames": 110, "text": "Hydra", "sub": "realtime analytics workspace", "cta": "hydra.app" }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "title": "IP NEXUS",
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "theme": "cinematic-dark",
+    "accent": "#41A3EF",
+    "accent2": "#FCCE50",
+    "music": "minimal-tech",
+    "bpm": 100,
+    "totalSeconds": 52,
+    "media": {
+      "home":   { "kind": "still", "src": "captures/home.png" },
+      "graph":  { "kind": "still", "src": "captures/graph.png" },
+      "search": { "kind": "clip",  "src": "captures/search.webm", "durationInFrames": 80 }
+    }
+  },
+  "scenes": [
+    { "type": "title", "durationInFrames": 75, "sfx": "whoosh",
+      "text": "See on-chain IP, mapped.", "sub": "IP NEXUS · genealogy explorer for Story Protocol",
+      "media": "graph" },
+
+    { "type": "problem", "durationInFrames": 75,
+      "lines": ["On-chain IP data is raw and opaque.", "Who is the root? What derives from what?"] },
+
+    { "type": "ui", "durationInFrames": 90, "transitionIn": "fade", "media": "home",
+      "kenBurns": "in", "frame": "browser", "caption": "search any IP asset" },
+
+    { "type": "feature-montage", "durationInFrames": 120, "over": "graph", "perItemFrames": 30,
+      "items": [
+        { "icon": "git-branch", "text": "Trace lineage" },
+        { "icon": "search",     "text": "Deep search" },
+        { "icon": "activity",   "text": "Real-time genealogy" },
+        { "icon": "zap",        "text": "Root vs derivative" }
+      ] },
+
+    { "type": "demo", "durationInFrames": 90, "sfx": "tick", "media": "search",
+      "caption": "root → derivatives, live" },
+
+    { "type": "architecture", "durationInFrames": 110, "transitionIn": "slide", "sfx": "riser",
+      "caption": "how it works",
+      "mermaid": "flowchart LR; ID[IP id] --> SDK[Story Protocol SDK]; SDK --> T[transform]; T --> G[force graph]" },
+
+    { "type": "techstack", "durationInFrames": 80, "caption": "built with",
+      "items": [
+        { "name": "Next.js 14" }, { "name": "TypeScript" }, { "name": "D3 / force-graph" },
+        { "name": "Story SDK" }, { "name": "Tailwind" }
+      ] },
+
+    { "type": "stat", "durationInFrames": 70, "sfx": "thock",
+      "value": "100%", "label": "traceability & transparency", "sub": "opaque chain → living map" },
+
+    { "type": "ui", "durationInFrames": 70, "media": "graph", "kenBurns": "out", "frame": "browser" },
+
+    { "type": "outro", "durationInFrames": 90, "sfx": "impact",
+      "text": "IP NEXUS", "sub": "force-directed genealogy · Story Protocol",
+      "cta": "ip-nexus-story-protocol.vercel.app" }
+  ]
+}

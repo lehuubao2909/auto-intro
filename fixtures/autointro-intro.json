@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "title": "AutoIntro", "fps": 30, "width": 1920, "height": 1080,
+    "theme": "cinematic-dark", "accent": "#41A3EF", "accent2": "#FCCE50", "totalSeconds": 59,
+    "design": {
+      "mode": "dark", "glass": true, "radius": 16, "font": "Inter",
+      "palette": { "bg": "#080B12", "surface": "#121A2A", "text": "#F4F7FB", "dim": "#9AA7B8", "accent": "#41A3EF", "accent2": "#FCCE50" }
+    }
+  },
+  "scenes": [
+    { "type": "title", "durationInFrames": 100, "transitionIn": "zoom", "sfx": "whoosh",
+      "text": "Your repo is the pitch.", "sub": "AutoIntro · turn any codebase into a 60-second intro video" },
+
+    { "type": "problem", "durationInFrames": 110, "transitionIn": "fade",
+      "lines": ["Great projects ship with a rushed demo — or none.", "Agents, CLIs and APIs have no UI to record."] },
+
+    { "type": "ui-sequence", "durationInFrames": 250, "transitionIn": "slide", "sfx": "tick",
+      "caption": "One local command — code in, video out",
+      "steps": [
+        { "primitive": "terminal", "props": { "command": "npx auto-intro .", "output": ["Reading your project…", "✓ Understood: CLI · 42 components", "Directing the story with Gemini…"] } },
+        { "primitive": "progress-steps", "props": { "title": "AutoIntro pipeline", "steps": ["Analyze repo", "Extract design", "Direct storyboard", "Render with Remotion"] } },
+        { "primitive": "card", "props": { "title": "intro.mp4 — ready", "body": "60s · 1080p · rendered locally", "icon": "Play" } }
+      ] },
+
+    { "type": "ui-bento", "durationInFrames": 200, "transitionIn": "push", "cols": 2,
+      "caption": "It actually understands your project",
+      "sidebar": { "items": [ { "icon": "LayoutDashboard", "label": "Overview" }, { "icon": "Workflow", "label": "Usage" }, { "icon": "Folder", "label": "Components" } ], "active": 1 },
+      "tiles": [
+        { "primitive": "stat-tile", "props": { "label": "Files read", "value": 128, "delta": "triaged" } },
+        { "primitive": "card", "props": { "title": "Usage type", "body": "Detected: CLI tool", "icon": "Workflow" } },
+        { "primitive": "donut-chart", "props": { "percent": 92, "label": "design captured" } },
+        { "primitive": "metric-grid", "props": { "metrics": [ { "label": "Palette", "value": "6" }, { "label": "Fonts", "value": "Inter" }, { "label": "Surfaces", "value": "9" }, { "label": "Logo", "value": "✓" } ] } }
+      ] },
+
+    { "type": "feature-montage", "durationInFrames": 200, "transitionIn": "clip", "perItemFrames": 40,
+      "items": [
+        { "icon": "Wand2", "text": "Recreates your UI" },
+        { "icon": "Shield", "text": "No screen recording" },
+        { "icon": "Sparkles", "text": "Themed to your brand" },
+        { "icon": "Zap", "text": "42 motion primitives" },
+        { "icon": "Lock", "text": "100% local" }
+      ] },
+
+    { "type": "ui-bento", "durationInFrames": 210, "transitionIn": "zoom", "cols": 2, "sfx": "riser",
+      "caption": "Your UI, rebuilt as motion-graphics",
+      "sidebar": { "items": [ { "icon": "LayoutDashboard", "label": "Dashboard" }, { "icon": "TrendingUp", "label": "Analytics" }, { "icon": "Settings", "label": "Settings" } ], "active": 0 },
+      "tiles": [
+        { "primitive": "stat-tile", "props": { "label": "Active users", "value": 12480, "delta": "+18%" } },
+        { "primitive": "stat-tile", "props": { "label": "Revenue", "value": 92, "suffix": "k", "delta": "+7%" } },
+        { "primitive": "donut-chart", "props": { "percent": 74, "label": "engagement" } },
+        { "primitive": "line-chart", "props": { "values": [20, 32, 28, 46, 40, 64, 72] } }
+      ] },
+
+    { "type": "ui-sequence", "durationInFrames": 200, "transitionIn": "slide",
+      "caption": "Adapts to any project — CLI, SDK, API, web",
+      "steps": [
+        { "primitive": "terminal", "props": { "command": "npx auto-intro ./my-cli", "output": ["✓ CLI flow detected"] } },
+        { "primitive": "code-snippet", "props": { "code": "import { track } from \"my-sdk\";\n\ntrack(\"signup\", { plan: \"pro\" });", "lang": "ts", "caption": "SDK → real usage snippet" } },
+        { "primitive": "api-exchange", "props": { "method": "GET", "endpoint": "/v1/insights", "response": "{ \"visitors\": 12480, \"live\": 38 }" } }
+      ] },
+
+    { "type": "architecture", "durationInFrames": 170, "transitionIn": "push", "sfx": "riser",
+      "caption": "How it works",
+      "graph": { "nodes": [ { "id": "r", "label": "Local repo" }, { "id": "a", "label": "Analyze" }, { "id": "g", "label": "Gemini Director" }, { "id": "m", "label": "Remotion" }, { "id": "v", "label": "MP4" } ],
+        "edges": [ { "from": "r", "to": "a" }, { "from": "a", "to": "g" }, { "from": "g", "to": "m" }, { "from": "m", "to": "v" } ] } },
+
+    { "type": "stat", "durationInFrames": 95, "transitionIn": "zoom", "sfx": "thock",
+      "value": "0", "label": "bytes of your code uploaded", "sub": "everything runs on your machine" },
+
+    { "type": "techstack", "durationInFrames": 130, "transitionIn": "fade", "caption": "built with",
+      "items": [ { "name": "TypeScript" }, { "name": "Remotion" }, { "name": "React" }, { "name": "Gemini" }, { "name": "Fastify" } ] },
+
+    { "type": "outro", "durationInFrames": 120, "transitionIn": "zoom", "sfx": "impact",
+      "text": "AutoIntro", "sub": "Your repository, introduced.", "cta": "npx auto-intro" }
+  ]
+}

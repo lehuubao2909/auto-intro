@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+.auto-intro/
+captures/
+out/
+*.mp4
+*.webm
+.DS_Store
+.autodemo/

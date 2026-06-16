@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoIntro — Complete Setup Guide</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
+      background: #080B12;
+      color: #E0E0E6;
+      line-height: 1.6;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sticky header + nav */
+    header {
+      background: linear-gradient(180deg, #0F1119 0%, #080B12 100%);
+      border-bottom: 1px solid #1a1f2e;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: #41A3EF;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: #999;
+    }
+
+    .container {
+      display: flex;
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Sidebar TOC */
+    aside {
+      width: 280px;
+      background: #0F1119;
+      border-right: 1px solid #1a1f2e;
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+      position: sticky;
+      top: 120px;
+    }
+
+    aside h3 {
+      font-size: 0.9rem;
+      color: #41A3EF;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    aside h3:first-child {
+      margin-top: 0;
+    }
+
+    aside ul {
+      list-style: none;
+    }
+
+    aside li {
+      margin-bottom: 0.6rem;
+    }
+
+    aside a {
+      color: #999;
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: block;
+      padding: 0.3rem 0;
+      border-left: 2px solid transparent;
+      padding-left: 0.8rem;
+      transition: all 0.2s ease;
+    }
+
+    aside a:hover {
+      color: #41A3EF;
+      border-left-color: #41A3EF;
+    }
+
+    /* Main content */
+    main {
+      flex: 1;
+      padding: 3rem 3rem;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+    }
+
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 150px;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      color: #41A3EF;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #1a1f2e;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      color: #FCCE50;
+      margin-top: 1.8rem;
+      margin-bottom: 0.8rem;
+    }
+
+    h4 {
+      font-size: 1.1rem;
+      color: #E0E0E6;
+      margin-top: 1.2rem;
+      margin-bottom: 0.6rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #C0C0C6;
+    }
+
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.6rem;
+    }
+
+    code {
+      background: #0F1119;
+      color: #41A3EF;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.95em;
+      font-family: "Monaco", "Courier New", monospace;
+    }
+
+    pre {
+      background: #0F1119;
+      border: 1px solid #1a1f2e;
+      border-radius: 6px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    pre code {
+      background: none;
+      color: #E0E0E6;
+      padding: 0;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.8rem;
+      right: 0.8rem;
+      background: #41A3EF;
+      color: #000;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    pre:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .copy-btn:hover {
+      background: #FCCE50;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background: #0F1119;
+      color: #41A3EF;
+      text-align: left;
+      padding: 0.8rem;
+      border: 1px solid #1a1f2e;
+    }
+
+    td {
+      padding: 0.8rem;
+      border: 1px solid #1a1f2e;
+      color: #C0C0C6;
+    }
+
+    tr:nth-child(even) {
+      background: rgba(65, 163, 239, 0.02);
+    }
+
+    .info-box, .warning-box, .success-box {
+      border-left: 4px solid;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 4px;
+      background: rgba(65, 163, 239, 0.05);
+    }
+
+    .info-box {
+      border-left-color: #41A3EF;
+    }
+
+    .warning-box {
+      border-left-color: #FCCE50;
+      background: rgba(252, 206, 80, 0.05);
+    }
+
+    .success-box {
+      border-left-color: #4CAF50;
+      background: rgba(76, 175, 80, 0.05);
+    }
+
+    .step {
+      display: flex;
+      margin-bottom: 2rem;
+    }
+
+    .step-num {
+      background: #41A3EF;
+      color: #000;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 1rem;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-content h4 {
+      margin-top: 0;
+      color: #41A3EF;
+    }
+
+    .faq-item {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #0F1119;
+      border-left: 3px solid #FCCE50;
+      border-radius: 4px;
+    }
+
+    .faq-item strong {
+      color: #FCCE50;
+    }
+
+    a {
+      color: #41A3EF;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      background: #0F1119;
+      border-top: 1px solid #1a1f2e;
+      padding: 2rem;
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        flex-direction: column;
+      }
+
+      aside {
+        width: 100%;
+        max-height: none;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid #1a1f2e;
+        padding: 1.5rem;
+      }
+
+      main {
+        padding: 2rem;
+        max-height: none;
+      }
+
+      header {
+        position: static;
+      }
+    }
+
+    .highlight {
+      background: rgba(252, 206, 80, 0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      color: #FCCE50;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AutoIntro Setup & Usage Guide</h1>
+    <p>Complete walkthrough for generating intro videos from code repositories</p>
+  </header>
+
+  <div class="container">
+    <aside>
+      <h3>Getting Started</h3>
+      <ul>
+        <li><a href="#what-is">What AutoIntro Does</a></li>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#getting-key">Getting a Gemini Key</a></li>
+      </ul>
+
+      <h3>Installation</h3>
+      <ul>
+        <li><a href="#clone-install">Clone & Install</a></li>
+        <li><a href="#env-setup">.env Setup</a></li>
+        <li><a href="#verify-setup">Verify Setup</a></li>
+      </ul>
+
+      <h3>Running AutoIntro</h3>
+      <ul>
+        <li><a href="#first-run">First Run (Web UI)</a></li>
+        <li><a href="#web-ui-walkthrough">Web UI Walkthrough</a></li>
+        <li><a href="#headless-mode">Headless Mode (--yes)</a></li>
+        <li><a href="#outputs">Understanding Outputs</a></li>
+      </ul>
+
+      <h3>Configuration</h3>
+      <ul>
+        <li><a href="#env-vars">All Environment Variables</a></li>
+        <li><a href="#models">Swapping LLM Models</a></li>
+        <li><a href="#video-settings">Video Settings</a></li>
+      </ul>
+
+      <h3>Troubleshooting</h3>
+      <ul>
+        <li><a href="#no-gemini-key">No GEMINI_API_KEY</a></li>
+        <li><a href="#gemini-errors">Gemini Errors (503, Rate Limit)</a></li>
+        <li><a href="#disk-space">Disk Space Issues</a></li>
+        <li><a href="#slow-first-run">Slow First Run</a></li>
+        <li><a href="#video-quality">Video Quality Issues</a></li>
+      </ul>
+
+      <h3>Advanced</h3>
+      <ul>
+        <li><a href="#how-it-works">How AutoIntro Works</a></li>
+        <li><a href="#brief-editing">Editing the Brief</a></li>
+        <li><a href="#storyboard-editing">Editing the Storyboard</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <!-- What is AutoIntro -->
+      <section id="what-is">
+        <h2>What AutoIntro Does</h2>
+        <p>AutoIntro is a <span class="highlight">local-first</span> tool that converts any code repository into a professional 45–60 second intro video (.mp4) without uploading your code.</p>
+
+        <h3>The Process</h3>
+        <ol>
+          <li><strong>Analyzes</strong> your repo (reads package.json, scans source files)</li>
+          <li><strong>Detects the UI</strong> (colors, fonts, components, logo)</li>
+          <li><strong>Determines usage patterns</strong> (CLI tool? Web app? SDK? API? Mobile? Desktop?)</li>
+          <li><strong>Builds a narrative</strong> (brief + call-to-action)</li>
+          <li><strong>Directs with AI</strong> (Gemini creates a storyboard of animated scenes)</li>
+          <li><strong>Renders locally</strong> (Remotion + Chromium, nothing uploaded)</li>
+        </ol>
+
+        <p>Result: A visually polished video showcasing your project's core flow — ready for README, social media, product pages, or pitches.</p>
+
+        <div class="info-box">
+          <strong>Privacy:</strong> Your repo and video never leave your machine. Only code/analysis text is sent to Gemini for story direction. No screenshots, no uploads to any server.
+        </div>
+      </section>
+
+      <!-- Prerequisites -->
+      <section id="prerequisites">
+        <h2>Prerequisites</h2>
+
+        <h3>System Requirements</h3>
+        <ul>
+          <li><strong>Node.js ≥ 20</strong> — Check with <code>node --version</code></li>
+          <li><strong>macOS, Linux, or Windows</strong> (any OS Node runs on)</li>
+          <li><strong>~500 MB free disk space</strong> (for Chromium + rendering temp files)</li>
+        </ul>
+
+        <h3>API Key</h3>
+        <p>You need a <strong>Gemini API key</strong> (free tier available). Without it, AutoIntro uses a lower-quality offline fallback.</p>
+        <p><a href="https://aistudio.google.com/apikey">Get your Gemini API key →</a></p>
+
+        <div class="info-box">
+          <strong>Free tier:</strong> Gemini's free tier includes 15 requests per minute and covers most use cases. If you hit limits, wait 30 seconds or upgrade.
+        </div>
+      </section>
+
+      <!-- Getting Gemini Key -->
+      <section id="getting-key">
+        <h2>Getting a Gemini API Key</h2>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Visit Google AI Studio</h4>
+            <p>Open <a href="https://aistudio.google.com/apikey" target="_blank">https://aistudio.google.com/apikey</a> in your browser.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Sign In</h4>
+            <p>Sign in with your Google account (create one if needed).</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Create API Key</h4>
+            <p>Click <strong>"Create API Key"</strong> → <strong>"Create API key in new project"</strong>.</p>
+            <p>Your key appears in the text field (looks like <code>AIza...</code>).</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Copy & Save</h4>
+            <p>Click the <strong>copy icon</strong> next to your key. Save it somewhere safe (you'll paste it in a moment).</p>
+          </div>
+        </div>
+
+        <div class="warning-box">
+          <strong>Security:</strong> Treat your API key like a password. Don't commit it to Git. Use a <code>.env</code> file (which should be in <code>.gitignore</code>).
+        </div>
+      </section>
+
+      <!-- Clone & Install -->
+      <section id="clone-install">
+        <h2>Clone & Install</h2>
+
+        <h3>Option A: Fresh Clone (Recommended for First-Timers)</h3>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Clone the Repository</h4>
+            <pre><code>git clone https://github.com/lehuubao/auto-intro.git
+cd auto-intro</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Install Dependencies</h4>
+            <pre><code>npm install</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+            <p>This downloads all required packages (~300 MB). Takes 1–2 minutes depending on your internet speed.</p>
+          </div>
+        </div>
+
+        <h3>Option B: Add to Existing Project</h3>
+        <p>If you already have AutoIntro cloned elsewhere, just navigate to it:</p>
+        <pre><code>cd /path/to/auto-intro
+npm install</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+      </section>
+
+      <!-- .env Setup -->
+      <section id="env-setup">
+        <h2>.env Setup</h2>
+
+        <h3>Create Your .env File</h3>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>In the AutoIntro directory</h4>
+            <p>Open a terminal in the <code>auto-intro</code> folder and create a <code>.env</code> file:</p>
+            <pre><code>cat > .env << 'EOF'
+GEMINI_API_KEY=YOUR_KEY_HERE
+EOF</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+            <p><strong>Replace <code>YOUR_KEY_HERE</code></strong> with the key you copied earlier (looks like <code>AIza...</code>).</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Verify It Worked</h4>
+            <pre><code>cat .env</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+            <p>You should see your key printed.</p>
+          </div>
+        </div>
+
+        <h3>Security: Ensure .gitignore</h3>
+        <p>Make sure <code>.env</code> is in <code>.gitignore</code> so your key never gets committed:</p>
+        <pre><code>cat .gitignore | grep .env</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+        <p>If <code>.env</code> isn't listed, add it:</p>
+        <pre><code>echo ".env" >> .gitignore</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <div class="info-box">
+          <strong>Alternative:</strong> You can also set the environment variable directly without a <code>.env</code> file:
+          <pre><code>export GEMINI_API_KEY=YOUR_KEY_HERE
+npm run dev -- /path/to/repo</code></pre>
+        </div>
+      </section>
+
+      <!-- Verify Setup -->
+      <section id="verify-setup">
+        <h2>Verify Setup</h2>
+
+        <p>Run a quick test to make sure everything is working:</p>
+
+        <pre><code>npm run typecheck</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <p>You should see:</p>
+        <pre><code>(no output = success)</code></pre>
+
+        <p>Or for a more thorough check:</p>
+        <pre><code>npm run build</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <p>This compiles the TypeScript. If there are errors, you'll see them. If successful, you'll see:</p>
+        <pre><code>✓ Compiled successfully</code></pre>
+
+        <div class="success-box">
+          <strong>Ready to go!</strong> You've installed AutoIntro and configured your Gemini API key. Time to generate your first trailer.
+        </div>
+      </section>
+
+      <!-- First Run -->
+      <section id="first-run">
+        <h2>First Run: Web UI</h2>
+
+        <h3>Start AutoIntro</h3>
+
+        <p>In the AutoIntro directory, run:</p>
+        <pre><code>npm run dev -- /path/to/your/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <p><strong>Replace <code>/path/to/your/repo</code></strong> with the actual path to any code repository you want to create a video for.</p>
+
+        <h3>Example</h3>
+        <pre><code># For a repo in your home directory
+npm run dev -- ~/my-awesome-project
+
+# Or if AutoIntro is IN the repo you're analyzing
+npm run dev -- .</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <h3>What Happens</h3>
+        <ol>
+          <li>AutoIntro <strong>starts a local server</strong> on a free port (usually http://localhost:4747 or similar)</li>
+          <li>Your browser <strong>opens automatically</strong> to the web UI</li>
+          <li>You're ready to begin the analysis flow</li>
+        </ol>
+
+        <p>Your terminal shows:</p>
+        <pre><code>  AutoIntro running:  http://localhost:4747
+  Target repo:       /path/to/your/repo
+  Director / triage: gemini-3.5-flash / gemini-3.1-flash-lite
+  Flow: Analyze → review brief → approve → render  (add --yes to skip the gate)
+
+  (Ctrl+C to stop)</code></pre>
+
+        <div class="info-box">
+          <strong>First-time slow?</strong> On the first run, Remotion auto-downloads a headless Chromium (~100 MB). Expect 5–10 minutes on first launch. Subsequent runs are 2–5 minutes.
+        </div>
+      </section>
+
+      <!-- Web UI Walkthrough -->
+      <section id="web-ui-walkthrough">
+        <h2>Web UI Walkthrough</h2>
+
+        <h3>Step 1: Click "Analyze Project"</h3>
+        <p>The web UI shows a big button. Click <strong>"Analyze Project"</strong> to start scanning your repo.</p>
+        <p><strong>What's happening:</strong></p>
+        <ul>
+          <li>Reading <code>package.json</code> and project metadata</li>
+          <li>Detecting usage type (CLI, SDK, web app, API, mobile, desktop)</li>
+          <li>Scanning source files to extract design (colors, fonts, components)</li>
+          <li>Building an inventory of UI surfaces</li>
+        </ul>
+        <p><strong>Time:</strong> 30–60 seconds</p>
+
+        <h3>Step 2: Review the Brief</h3>
+        <p>Once analysis completes, the web UI shows the <strong>"Project Brief"</strong> — a markdown summary of what the video will tell the story of.</p>
+
+        <p><strong>The brief includes:</strong></p>
+        <ul>
+          <li><strong>Project Name</strong> — what it's called</li>
+          <li><strong>Usage Type</strong> — how people use it (e.g., "CLI tool")</li>
+          <li><strong>Core Value</strong> — one-sentence hook</li>
+          <li><strong>Key Features</strong> — 3–5 bullets</li>
+          <li><strong>Usage Flow</strong> — step-by-step of a typical interaction</li>
+          <li><strong>Call-to-Action</strong> — "Get Started" / "Docs" / "GitHub" / etc.</li>
+        </ul>
+
+        <p><strong>Can you edit it?</strong> Yes! Click the edit button to refine the narrative. If the tool got something wrong, fix it here. The brief is the "contract" the video will be built from.</p>
+
+        <h3>Step 3: Click "Approve & Generate"</h3>
+        <p>Once you're happy with the brief, click <strong>"Approve & Generate"</strong>.</p>
+
+        <p><strong>What happens next (takes 2–5 minutes):</strong></p>
+        <ol>
+          <li><strong>Directing</strong> — Gemini generates a scene-by-scene storyboard (60–90 sec)</li>
+          <li><strong>Rendering</strong> — Remotion renders each scene in Chromium (1–3 min)</li>
+          <li><strong>Complete</strong> — Your video is ready</li>
+        </ol>
+
+        <p>You'll see live progress on the screen (e.g., "Rendering 45%").</p>
+
+        <h3>Step 4: Download or Re-Render</h3>
+        <p>Once the video is done:</p>
+        <ul>
+          <li><strong>Preview</strong> — Watch it in the browser player</li>
+          <li><strong>Download</strong> — Get the <code>.mp4</code> file</li>
+          <li><strong>Re-render</strong> — Edit the brief or storyboard and render again (no re-analysis needed)</li>
+        </ul>
+
+        <p><strong>Where's the video saved?</strong> In <code>&lt;repo&gt;/.auto-intro/trailer.mp4</code> (also shown on the download page).</p>
+      </section>
+
+      <!-- Headless Mode -->
+      <section id="headless-mode">
+        <h2>Headless Mode (--yes flag)</h2>
+
+        <p>If you want to skip the web UI approval gate and render immediately, use the <code>--yes</code> or <code>-y</code> flag:</p>
+
+        <pre><code>npm run dev -- /path/to/repo --yes</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <p>Or short form:</p>
+        <pre><code>npm run dev -- /path/to/repo -y</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <h3>What Happens</h3>
+        <ol>
+          <li><strong>Analyzes</strong> the repo (no browser UI)</li>
+          <li><strong>Auto-approves</strong> the brief (uses defaults)</li>
+          <li><strong>Renders</strong> immediately</li>
+          <li><strong>Outputs</strong> the video path and exits</li>
+        </ol>
+
+        <p>All progress is printed to the terminal (no interactive UI).</p>
+
+        <h3>Use Cases</h3>
+        <ul>
+          <li>CI/CD pipelines (auto-generate trailers on release)</li>
+          <li>Batch processing multiple repos</li>
+          <li>Server-side automation</li>
+          <li>When you want to skip the UI entirely</li>
+        </ul>
+
+        <h3>Example Output</h3>
+        <pre><code>AutoIntro (--yes): /path/to/repo
+
+  [analyze/ok] Analyzing repository…
+  [inspect/ok] Reading the project's design…
+  [brief/ok] Writing project brief…
+  [direct/ok] Directing storyboard (Gemini)…
+  [render/ok] Rendering 25%
+  [render/ok] Rendering 50%
+  [render/ok] Rendering 75%
+  [render/ok] Rendering 100%
+  [done/ok] Trailer ready
+
+✓ Trailer: /path/to/repo/.auto-intro/trailer.mp4</code></pre>
+      </section>
+
+      <!-- Outputs -->
+      <section id="outputs">
+        <h2>Understanding Outputs</h2>
+
+        <p>After analysis and rendering, AutoIntro creates a <code>.auto-intro/</code> folder in your target repo with these files:</p>
+
+        <table>
+          <tr>
+            <th>File</th>
+            <th>Purpose</th>
+          </tr>
+          <tr>
+            <td><code>repo-facts.json</code></td>
+            <td>Detected project name, usage type, dependencies, estimated complexity</td>
+          </tr>
+          <tr>
+            <td><code>design-profile.json</code></td>
+            <td>Extracted theme, palette (primary/secondary colors), fonts, logo URL</td>
+          </tr>
+          <tr>
+            <td><code>component-inventory.json</code></td>
+            <td>Mapped UI components to 42 primitive shapes/animations</td>
+          </tr>
+          <tr>
+            <td><code>brief.json</code></td>
+            <td>Approved narrative (structure: project name, value, features, flow, CTA)</td>
+          </tr>
+          <tr>
+            <td><code>brief.md</code></td>
+            <td>Human-readable brief (what you edited in the web UI)</td>
+          </tr>
+          <tr>
+            <td><code>storyboard.json</code></td>
+            <td>Scene-by-scene video blueprint (scenes, timing, animations) — editable by power users</td>
+          </tr>
+          <tr>
+            <td><code>trailer.mp4</code></td>
+            <td><strong>Your final video.</strong> Share this!</td>
+          </tr>
+        </table>
+
+        <h3>Can I Edit These?</h3>
+        <p>Yes, for power users:</p>
+        <ul>
+          <li><strong>brief.json / brief.md</strong> — Edit via the web UI. Re-rendering picks up changes.</li>
+          <li><strong>storyboard.json</strong> — Advanced users can hand-edit scene details (timing, positions, animations). Requires careful JSON editing.</li>
+          <li><strong>The rest</strong> — Read-only. Regenerate the analysis if needed.</li>
+        </ul>
+
+        <div class="info-box">
+          <strong>Safe to delete:</strong> You can safely delete the <code>.auto-intro/</code> folder and re-run AutoIntro. It regenerates everything. Useful if you want to start fresh with a new brief.
+        </div>
+      </section>
+
+      <!-- Environment Variables -->
+      <section id="env-vars">
+        <h2>All Environment Variables</h2>
+
+        <p>Complete reference for all configuration options. Set them in your <code>.env</code> file or export them before running.</p>
+
+        <table>
+          <tr>
+            <th>Variable</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td><code>GEMINI_API_KEY</code></td>
+            <td>string</td>
+            <td>(required)</td>
+            <td>Your Gemini API key. Get at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>. Also accepts <code>GOOGLE_API_KEY</code>.</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_DIRECTOR_MODEL</code></td>
+            <td>string</td>
+            <td><code>gemini-3.5-flash</code></td>
+            <td>Model for storyboard generation. Try <code>gemini-2.0-pro</code> for higher accuracy (slower, higher cost).</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_TRIAGE_MODEL</code></td>
+            <td>string</td>
+            <td><code>gemini-3.1-flash-lite</code></td>
+            <td>Model for repo analysis. Use lite version for speed/cost.</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_PORT</code></td>
+            <td>number</td>
+            <td><code>0</code> (auto)</td>
+            <td>Server port. <code>0</code> = auto-pick a free port. Set to <code>4747</code> for a fixed port.</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_FPS</code></td>
+            <td>number</td>
+            <td><code>30</code></td>
+            <td>Video frames per second. Increase to 60 for smoother animations (slower render).</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_WIDTH</code></td>
+            <td>number</td>
+            <td><code>1920</code></td>
+            <td>Video width in pixels. Common values: 1920 (1080p), 1280 (720p), 2560 (1440p).</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_HEIGHT</code></td>
+            <td>number</td>
+            <td><code>1080</code></td>
+            <td>Video height in pixels.</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_THEME</code></td>
+            <td>string</td>
+            <td><code>cinematic-dark</code></td>
+            <td>Rendering theme. Applied post-generation to set mood/tone.</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_ACCENT</code></td>
+            <td>hex color</td>
+            <td><code>#41A3EF</code></td>
+            <td>Primary brand color (e.g., <code>#FF5733</code>). Used throughout animations.</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_ACCENT2</code></td>
+            <td>hex color</td>
+            <td><code>#FCCE50</code></td>
+            <td>Secondary accent color. Sparingly used for highlights.</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_MAX_FULL_READ</code></td>
+            <td>number</td>
+            <td><code>10</code></td>
+            <td>Max files to fully read during analysis. Higher = more context, slower. Hard cap.</td>
+          </tr>
+          <tr>
+            <td><code>AUTOINTRO_WORKDIR</code></td>
+            <td>string</td>
+            <td><code>.auto-intro</code></td>
+            <td>Output directory name (created in the target repo).</td>
+          </tr>
+        </table>
+
+        <h3>Example: Custom Configuration</h3>
+        <p>Create a <code>.env</code> file with custom settings:</p>
+        <pre><code>GEMINI_API_KEY=your_key_here
+AUTOINTRO_DIRECTOR_MODEL=gemini-2.0-pro
+AUTOINTRO_FPS=60
+AUTOINTRO_WIDTH=2560
+AUTOINTRO_HEIGHT=1440
+AUTOINTRO_ACCENT=#FF5733</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <p>Then run as usual:</p>
+        <pre><code>npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+      </section>
+
+      <!-- Swapping Models -->
+      <section id="models">
+        <h2>Swapping LLM Models</h2>
+
+        <h3>Why Change Models?</h3>
+        <ul>
+          <li><strong>Higher accuracy:</strong> Use <code>gemini-2.0-pro</code> instead of <code>gemini-3.5-flash</code></li>
+          <li><strong>Lower cost:</strong> Use <code>gemini-3.1-flash-lite</code> for both director and triage</li>
+          <li><strong>Experiment:</strong> Test different models to see which works best for your use case</li>
+        </ul>
+
+        <h3>Available Models</h3>
+        <ul>
+          <li><strong>gemini-3.5-flash</strong> — Fast, balanced. Best default.</li>
+          <li><strong>gemini-2.0-pro</strong> — Strongest. Slower, higher cost.</li>
+          <li><strong>gemini-3.1-flash-lite</strong> — Cheapest. Good for triage (repo analysis).</li>
+          <li>Check <a href="https://ai.google.dev/models" target="_blank">Google's model list</a> for latest options.</li>
+        </ul>
+
+        <h3>Set Director Model</h3>
+        <p>For storyboard generation (the most important model):</p>
+        <pre><code>export AUTOINTRO_DIRECTOR_MODEL=gemini-2.0-pro
+npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <h3>Set Triage Model</h3>
+        <p>For repo analysis (reading files, detecting type):</p>
+        <pre><code>export AUTOINTRO_TRIAGE_MODEL=gemini-3.1-flash-lite
+npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <h3>Set Both</h3>
+        <pre><code>export AUTOINTRO_DIRECTOR_MODEL=gemini-2.0-pro
+export AUTOINTRO_TRIAGE_MODEL=gemini-3.1-flash-lite
+npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <p>Or in <code>.env</code>:</p>
+        <pre><code>AUTOINTRO_DIRECTOR_MODEL=gemini-2.0-pro
+AUTOINTRO_TRIAGE_MODEL=gemini-3.1-flash-lite</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+      </section>
+
+      <!-- Video Settings -->
+      <section id="video-settings">
+        <h2>Video Settings</h2>
+
+        <h3>Resolution & Frame Rate</h3>
+
+        <h4>Standard 1080p (Default)</h4>
+        <pre><code>AUTOINTRO_WIDTH=1920
+AUTOINTRO_HEIGHT=1080
+AUTOINTRO_FPS=30</code></pre>
+        <p>Good balance of quality and render speed.</p>
+
+        <h4>High-Resolution 1440p</h4>
+        <pre><code>AUTOINTRO_WIDTH=2560
+AUTOINTRO_HEIGHT=1440
+AUTOINTRO_FPS=30</code></pre>
+        <p>Crisp, professional look. Takes ~1.5x longer to render.</p>
+
+        <h4>YouTube 720p (Faster)</h4>
+        <pre><code>AUTOINTRO_WIDTH=1280
+AUTOINTRO_HEIGHT=720
+AUTOINTRO_FPS=30</code></pre>
+        <p>Smaller file, faster rendering. Good for quick previews.</p>
+
+        <h4>Smooth 60fps</h4>
+        <pre><code>AUTOINTRO_FPS=60</code></pre>
+        <p>Doubles render time but animations look silky smooth.</p>
+
+        <h3>Color Customization</h3>
+
+        <p>Override the brand colors (from your code) with custom ones:</p>
+        <pre><code>AUTOINTRO_ACCENT=#FF5733
+AUTOINTRO_ACCENT2=#FFC300</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <p>Color values must be valid hex codes (6 digits + #).</p>
+
+        <div class="info-box">
+          <strong>Pro tip:</strong> Colors are auto-extracted from your project's CSS/Tailwind. Override only if you want a different look.
+        </div>
+      </section>
+
+      <!-- Troubleshooting: No Key -->
+      <section id="no-gemini-key">
+        <h2>Troubleshooting: No GEMINI_API_KEY</h2>
+
+        <h3>Error Message</h3>
+        <pre><code>Missing GEMINI_API_KEY. Set it in your environment (or a .env file) to run analysis + director.
+Get a key at https://aistudio.google.com/apikey</code></pre>
+
+        <h3>Solution</h3>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Get a Free Key</h4>
+            <p>Visit <a href="https://aistudio.google.com/apikey" target="_blank">https://aistudio.google.com/apikey</a> and create one (takes 2 minutes).</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Set It in .env</h4>
+            <pre><code>echo "GEMINI_API_KEY=YOUR_KEY_HERE" > .env</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+            <p><strong>Replace <code>YOUR_KEY_HERE</code></strong> with your actual key.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Retry</h4>
+            <pre><code>npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+          </div>
+        </div>
+
+        <h3>Or Set as Environment Variable</h3>
+        <pre><code>export GEMINI_API_KEY=YOUR_KEY_HERE
+npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <h3>Offline Fallback</h3>
+        <p>If you run without a key, AutoIntro uses a lower-quality fallback (no Gemini calls). The video will be generated but less polished. Add a key for best results.</p>
+      </section>
+
+      <!-- Troubleshooting: Gemini Errors -->
+      <section id="gemini-errors">
+        <h2>Troubleshooting: Gemini Errors (503, Rate Limit)</h2>
+
+        <h3>Error: "503 Service Unavailable" or "Rate Limited"</h3>
+
+        <p><strong>Why it happens:</strong> Gemini API is temporarily overloaded or you hit your usage quota.</p>
+
+        <h3>Solution</h3>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Wait & Retry</h4>
+            <p>AutoIntro auto-retries with exponential backoff. Usually resolves in 30 seconds.</p>
+            <p>If it still fails after 2–3 minutes:</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Check Your Quota</h4>
+            <p>Visit <a href="https://aistudio.google.com/app/apikey" target="_blank">https://aistudio.google.com/app/apikey</a> and check your usage.</p>
+            <p>Free tier: 15 requests per minute, generous daily limits.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Try a Cheaper Model</h4>
+            <p>Swap to a lighter model to reduce load:</p>
+            <pre><code>export AUTOINTRO_DIRECTOR_MODEL=gemini-3.1-flash-lite
+export AUTOINTRO_TRIAGE_MODEL=gemini-3.1-flash-lite
+npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Try Again Later</h4>
+            <p>If the API is globally overloaded, wait 5–10 minutes and retry.</p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <strong>Paid tier:</strong> If you consistently hit limits, consider upgrading to a paid Gemini plan for higher quotas.
+        </div>
+      </section>
+
+      <!-- Troubleshooting: Disk Space -->
+      <section id="disk-space">
+        <h2>Troubleshooting: Disk Space Issues</h2>
+
+        <h3>Error: "ENOSPC: no space left on device"</h3>
+
+        <p><strong>Why it happens:</strong> Your disk is full, or doesn't have enough space for Chromium + rendering.</p>
+
+        <h3>Solution</h3>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Free Up Space</h4>
+            <p>Check your disk usage:</p>
+            <pre><code>df -h</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+            <p>AutoIntro needs ~500 MB free. Delete files to free space.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Clear Cache</h4>
+            <p>Remotion caches Chromium. Clear it if you have old installations:</p>
+            <pre><code>rm -rf ~/.cache/remotion</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Retry</h4>
+            <pre><code>npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Troubleshooting: Slow First Run -->
+      <section id="slow-first-run">
+        <h2>Troubleshooting: Slow First Run</h2>
+
+        <h3>Problem: Takes 5–10 minutes on first run</h3>
+
+        <p><strong>Why it happens:</strong> On the first render, Remotion auto-downloads a headless Chromium (~100 MB). This is a one-time download.</p>
+
+        <h3>What to Expect</h3>
+        <ul>
+          <li><strong>First run:</strong> 5–10 minutes (includes Chromium download)</li>
+          <li><strong>Subsequent runs:</strong> 2–5 minutes</li>
+        </ul>
+
+        <h3>Speed It Up</h3>
+
+        <p><strong>Reduce resolution/FPS:</strong></p>
+        <pre><code>export AUTOINTRO_WIDTH=1280
+export AUTOINTRO_HEIGHT=720
+export AUTOINTRO_FPS=24
+npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <p>This renders faster while you're testing.</p>
+
+        <h3>Is Chromium Stuck?</h3>
+
+        <p>If it seems frozen, check your internet (Chromium download needs bandwidth). Open another terminal and watch the download:</p>
+        <pre><code>tail -f ~/.cache/remotion/browser-download-log.txt</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <div class="success-box">
+          After the first run, it's much faster. Subsequent renders of the same repo take ~2 minutes.
+        </div>
+      </section>
+
+      <!-- Troubleshooting: Video Quality -->
+      <section id="video-quality">
+        <h2>Troubleshooting: Video Quality Issues</h2>
+
+        <h3>Problem: Trailer looks wrong, missing scenes, or off-brand</h3>
+
+        <h3>Quick Fixes</h3>
+
+        <h4>1. Review the Brief</h4>
+        <p>Open <code>&lt;repo&gt;/.auto-intro/brief.md</code> and check if the narrative is correct.</p>
+        <p><strong>If it's wrong:</strong> Use the web UI to edit the brief before re-rendering. The brief is the "contract" — if it's inaccurate, the video won't match your vision.</p>
+
+        <h4>2. Re-render Without Re-analyzing</h4>
+        <p>Click the <strong>"Re-render"</strong> button in the web UI. This reuses the analysis but regenerates the video (faster than a full rerun).</p>
+
+        <h4>3. Edit the Storyboard (Power Users)</h4>
+        <p>Advanced users can hand-edit <code>&lt;repo&gt;/.auto-intro/storyboard.json</code> to tweak scenes, timing, and animations. After editing, click "Re-render".</p>
+
+        <h4>4. Use a Stronger Model</h4>
+        <p>Swap to <code>gemini-2.0-pro</code> for higher-quality storyboard generation:</p>
+        <pre><code>export AUTOINTRO_DIRECTOR_MODEL=gemini-2.0-pro
+npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <h4>5. Delete & Regenerate</h4>
+        <p>Remove the <code>.auto-intro/</code> folder and start fresh (clears cached analysis):</p>
+        <pre><code>rm -rf /path/to/repo/.auto-intro
+npm run dev -- /path/to/repo</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+        <h3>If It Still Looks Bad</h3>
+
+        <p>Possible causes:</p>
+        <ul>
+          <li><strong>Bad Gemini key:</strong> Check your API key is valid (visit <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a>)</li>
+          <li><strong>Low quota:</strong> You may be out of free requests. Wait or upgrade.</li>
+          <li><strong>Project is complex:</strong> AutoIntro works best on well-structured projects. Messy codebases may produce lower-quality results.</li>
+        </ul>
+      </section>
+
+      <!-- How It Works -->
+      <section id="how-it-works">
+        <h2>How AutoIntro Works (Technical)</h2>
+
+        <h3>The Five-Stage Pipeline</h3>
+
+        <h4>Stage 1: Analyze</h4>
+        <p><strong>Input:</strong> Path to a repo</p>
+        <p><strong>Process:</strong> Read <code>package.json</code>, scan file tree, detect usage type (CLI, SDK, web app, API, mobile, desktop) using heuristics and dependency names.</p>
+        <p><strong>Output:</strong> <code>repo-facts.json</code> (name, type, deps, complexity)</p>
+
+        <h4>Stage 2: Inspect Design & UI</h4>
+        <p><strong>Input:</strong> Repo root</p>
+        <p><strong>Process:</strong> Extract design token from source (Tailwind colors, CSS variables, component files). Detect brand logo.</p>
+        <p><strong>Output:</strong> <code>design-profile.json</code> (palette, fonts, theme), <code>component-inventory.json</code> (UI components mapped to primitives)</p>
+
+        <h4>Stage 3: Build Brief</h4>
+        <p><strong>Input:</strong> Repo facts + design</p>
+        <p><strong>Process:</strong> Synthesize a concise narrative: project name, value prop, key features, usage flow, CTA. <span class="highlight">Approval Gate Here</span> — you review before rendering.</p>
+        <p><strong>Output:</strong> <code>brief.json</code> + <code>brief.md</code></p>
+
+        <h4>Stage 4: Direct (Gemini)</h4>
+        <p><strong>Input:</strong> Approved brief + design + inventory</p>
+        <p><strong>Process:</strong> Gemini generates a scene-by-scene storyboard using the usage-type flow template + 42 animated UI primitives. Injects brand colors + typography.</p>
+        <p><strong>Output:</strong> <code>storyboard.json</code> (scenes, timing, animations)</p>
+
+        <h4>Stage 5: Render (Remotion)</h4>
+        <p><strong>Input:</strong> Storyboard</p>
+        <p><strong>Process:</strong> Remotion spawns a headless Chromium, renders each frame, encodes to MP4. Wrapped in a crash-safe boundary.</p>
+        <p><strong>Output:</strong> <code>trailer.mp4</code></p>
+
+        <h3>Privacy & Security</h3>
+        <ul>
+          <li><strong>Local-first:</strong> Everything runs on your machine. No uploads (except to Gemini for analysis).</li>
+          <li><strong>Gemini calls:</strong> Only code text + metadata leaves your device (repo facts, design profile, brief). Screenshots/video never uploaded.</li>
+          <li><strong>Outputs:</strong> All artifacts stay in <code>&lt;repo&gt;/.auto-intro/</code>. You control where they go.</li>
+        </ul>
+
+        <h3>Crash Recovery</h3>
+        <p>If rendering crashes, artifacts are preserved. You can re-run the same repo and AutoIntro reuses cached analysis + brief (much faster).</p>
+      </section>
+
+      <!-- Brief Editing -->
+      <section id="brief-editing">
+        <h2>Editing the Brief</h2>
+
+        <h3>Why Edit?</h3>
+        <p>The brief is the "contract" between analysis and rendering. If AutoIntro got the narrative wrong, edit it to set the story straight. The video will match your edited brief.</p>
+
+        <h3>How to Edit (Via Web UI)</h3>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>After Analysis</h4>
+            <p>The web UI shows the brief in a markdown editor. Click the <strong>"Edit"</strong> tab to switch to edit mode.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Make Changes</h4>
+            <p>Edit any field:</p>
+            <ul>
+              <li><strong>Project Name</strong> — what it's called</li>
+              <li><strong>Usage Type</strong> — how people use it</li>
+              <li><strong>Core Value</strong> — one-liner hook</li>
+              <li><strong>Key Features</strong> — bullet list</li>
+              <li><strong>Usage Flow</strong> — step-by-step</li>
+              <li><strong>Call-to-Action</strong> — where users should go next</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Save</h4>
+            <p>Click <strong>"Save Changes"</strong>. The brief updates in <code>brief.json</code>.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Re-render</h4>
+            <p>Click <strong>"Approve & Generate"</strong> (or <strong>"Re-render"</strong> if you already rendered). Gemini will use your updated brief.</p>
+          </div>
+        </div>
+
+        <h3>How to Edit (Direct File)</h3>
+
+        <p>For power users, edit <code>&lt;repo&gt;/.auto-intro/brief.json</code> directly:</p>
+
+        <pre><code>{
+  "projectName": "MyTool",
+  "usageType": "cli",
+  "coreValue": "A fast CLI for X",
+  "keyFeatures": ["Feature 1", "Feature 2"],
+  "usageFlow": ["Step 1", "Step 2"],
+  "callToAction": "Get Started"
+}</code></pre>
+
+        <p>Then re-render (web UI detects changes).</p>
+
+        <h3>What Changes Affect the Video?</h3>
+
+        <p>After editing the brief:</p>
+        <ul>
+          <li><strong>Re-render via web UI</strong> → Full regeneration (Gemini + Remotion) — takes 2–5 min</li>
+          <li><strong>Or edit storyboard + click "Re-render"</strong> → Just Remotion (no Gemini) — takes ~2 min</li>
+        </ul>
+
+        <div class="info-box">
+          If you only change colors/models, you can re-render the storyboard without changing the brief. If you change the narrative, re-run the full pipeline.
+        </div>
+      </section>
+
+      <!-- Storyboard Editing -->
+      <section id="storyboard-editing">
+        <h2>Editing the Storyboard (Power Users)</h2>
+
+        <h3>What's a Storyboard?</h3>
+
+        <p>The storyboard is a JSON file that describes the video scene-by-scene: scene descriptions, timing, animations, text, colors. Remotion reads it and renders the actual video.</p>
+
+        <p><strong>File:</strong> <code>&lt;repo&gt;/.auto-intro/storyboard.json</code></p>
+
+        <h3>Structure</h3>
+
+        <pre><code>{
+  "scenes": [
+    {
+      "id": "scene-1",
+      "type": "intro",
+      "duration": 3,
+      "title": "MyTool",
+      "description": "A fast CLI tool",
+      "animations": [...]
+    },
+    ...
+  ]
+}</code></pre>
+
+        <h3>When to Edit</h3>
+
+        <ul>
+          <li>Timing feels off (scenes too fast/slow) → adjust <code>duration</code></li>
+          <li>Animations are janky → modify <code>animations</code> array</li>
+          <li>Text is wrong → edit <code>title</code> / <code>description</code></li>
+          <li>Colors need tweaking → adjust <code>colors</code> in animation objects</li>
+        </ul>
+
+        <h3>How to Edit</h3>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Open the File</h4>
+            <pre><code>cat /path/to/repo/.auto-intro/storyboard.json</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Make Changes</h4>
+            <p>Edit JSON carefully (valid JSON is required). Use a JSON editor if possible.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Save & Re-render</h4>
+            <p>In the web UI, click <strong>"Re-render"</strong>. AutoIntro reads your edited storyboard and renders a new video (no Gemini call, ~2 min).</p>
+          </div>
+        </div>
+
+        <div class="warning-box">
+          <strong>Caution:</strong> Invalid JSON will cause rendering to fail. Always validate JSON syntax before saving. Use a tool like <a href="https://jsonlint.com/" target="_blank">JSONLint</a>.
+        </div>
+
+        <h3>Quick Edits</h3>
+
+        <h4>Speed Up a Scene</h4>
+        <pre><code>"duration": 3  // Change to 2 for faster</code></pre>
+
+        <h4>Change Scene Title</h4>
+        <pre><code>"title": "New Title Here"</code></pre>
+
+        <h4>Modify Colors</h4>
+        <p>Find hex color codes in animations and swap them:</p>
+        <pre><code>"color": "#41A3EF"  // Change to your color</code></pre>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq">
+        <h2>Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+          <strong>Q: Does my code get uploaded?</strong>
+          <p>No. Only text analysis (repo facts, design profile, narrative) is sent to Gemini. Video and screenshots never leave your machine.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: What if I don't have a Gemini key?</strong>
+          <p>AutoIntro uses a lower-quality offline fallback. For best results, get a free key at https://aistudio.google.com/apikey. Takes 2 minutes.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: How long does it take to generate a video?</strong>
+          <p>Analysis + render: 2–5 minutes on typical hardware (plus Chromium download on first run). Headless mode (--yes) is fastest.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: Can I use the videos commercially?</strong>
+          <p>Yes. The video is yours to use. However, Remotion (the rendering engine) has a license requirement for companies >3 employees. See https://www.remotion.dev/license.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: Can I edit the video after?</strong>
+          <p>The `.mp4` is final and playable in any video editor. For tweaks, re-render from AutoIntro (edit brief or storyboard + re-render).</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: What project types work best?</strong>
+          <p>Well-structured projects with clear UI, dependencies, and usage flows. CLI tools, SDKs, web apps, APIs, and mobile/desktop apps. Messy codebases may produce lower-quality results.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: Can I use it in CI/CD?</strong>
+          <p>Yes. Use the `--yes` flag for headless, one-shot rendering. Useful for auto-generating trailers on release.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: Does it require Playwright?</strong>
+          <p>No. Remotion uses its own headless Chromium. Playwright is not needed or used.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: What if Gemini rate-limits me?</strong>
+          <p>AutoIntro auto-retries with exponential backoff. Free tier is 15 requests/min. If you consistently hit limits, upgrade your Gemini plan.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: Can I generate multiple trailers?</strong>
+          <p>Yes. Run AutoIntro on different repos, or re-render the same repo with different briefs/settings. Each repo gets its own `.auto-intro/` folder.</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: How do I report a bug?</strong>
+          <p>Open an issue on GitHub: https://github.com/lehuubao/auto-intro/issues</p>
+        </div>
+
+        <div class="faq-item">
+          <strong>Q: Is there a GUI for editing without JSON?</strong>
+          <p>The web UI lets you edit the brief visually. For storyboard editing, you'll need to hand-edit JSON (power users only).</p>
+        </div>
+      </section>
+
+      <!-- How It Works (Summary) -->
+      <section id="how-it-works-summary">
+        <h2>Next Steps</h2>
+
+        <ol>
+          <li><strong>Get a Gemini key</strong> → https://aistudio.google.com/apikey</li>
+          <li><strong>Clone AutoIntro</strong> → <code>git clone https://github.com/lehuubao/auto-intro.git && cd auto-intro</code></li>
+          <li><strong>Install & configure</strong> → <code>npm install && echo "GEMINI_API_KEY=..." > .env</code></li>
+          <li><strong>Run on a test repo</strong> → <code>npm run dev -- /path/to/repo</code></li>
+          <li><strong>Review the brief</strong> → Edit if needed, then approve</li>
+          <li><strong>Download your video</strong> → Found in <code>&lt;repo&gt;/.auto-intro/trailer.mp4</code></li>
+        </ol>
+
+        <div class="success-box">
+          <strong>Ready?</strong> Your first video can be ready in under 10 minutes. Good luck!
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>AutoIntro — Local-first intro video generation from code repositories.</p>
+    <p>© 2025 Le Huu Bao. Licensed under MIT. <a href="https://github.com/lehuubao/auto-intro" target="_blank">View on GitHub</a></p>
+  </footer>
+
+  <script>
+    function copyCode(button) {
+      const pre = button.parentElement;
+      const code = pre.querySelector('code');
+      const text = code.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const original = button.textContent;
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+          button.textContent = original;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+
+    // Smooth scroll for sidebar links
+    document.querySelectorAll('aside a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = link.getAttribute('href');
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

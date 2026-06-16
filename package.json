@@ -1,0 +1,52 @@
+{
+  "name": "auto-intro",
+  "version": "0.0.1",
+  "description": "AutoIntro — local-first tool that turns a code repo into a 45-60s intro video (.mp4): reads the project, recreates its UI as animated motion-graphics, and renders locally with Remotion from a Gemini-directed storyboard.",
+  "type": "module",
+  "bin": {
+    "auto-intro": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "src",
+    "skill",
+    "assets",
+    "tsconfig.json"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx src/cli/index.ts",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fastify/static": "^9.1.3",
+    "@google/genai": "^1.0.0",
+    "@remotion/bundler": "^4.0.477",
+    "@remotion/cli": "^4.0.477",
+    "@remotion/renderer": "^4.0.477",
+    "fastify": "^5.8.5",
+    "get-port": "^7.2.0",
+    "lucide-react": "^1.18.0",
+    "open": "^11.0.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "remotion": "^4.0.477",
+    "shiki": "^4.2.0",
+    "simple-icons": "^16.23.0",
+    "zod": "^3.23.0",
+    "zod-to-json-schema": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.9"
+  }
+}

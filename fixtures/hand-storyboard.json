@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "title": "AutoDemo",
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "theme": "cinematic-dark",
+    "accent": "#41A3EF",
+    "accent2": "#FCCE50",
+    "totalSeconds": 47,
+    "media": {}
+  },
+  "scenes": [
+    { "type": "title", "durationInFrames": 110, "transitionIn": "fade", "sfx": "whoosh",
+      "text": "Your repo, as a trailer.", "sub": "AutoDemo · repo → 45–60s code trailer" },
+
+    { "type": "problem", "durationInFrames": 120,
+      "lines": ["Great projects ship with a rushed demo.", "Recording one is slow and manual."] },
+
+    { "type": "feature-montage", "durationInFrames": 200, "perItemFrames": 40, "sfx": "tick",
+      "items": [
+        { "icon": "🔍", "text": "Reads your repo" },
+        { "icon": "🎬", "text": "Captures real UI" },
+        { "icon": "🧠", "text": "Directs the story" },
+        { "icon": "⚡", "text": "Renders locally" },
+        { "icon": "🔒", "text": "Nothing uploaded" }
+      ] },
+
+    { "type": "techstack", "durationInFrames": 140, "caption": "built with",
+      "items": [
+        { "name": "TypeScript" }, { "name": "Remotion" }, { "name": "Playwright" },
+        { "name": "Gemini" }, { "name": "React" }
+      ] },
+
+    { "type": "architecture", "durationInFrames": 180, "transitionIn": "slide", "sfx": "riser",
+      "caption": "how it works",
+      "mermaid": "flowchart LR; Repo[Local repo] --> Analyze[Analyze]; Analyze --> Direct[Storyboard]; Direct --> Render[Remotion]; Render --> MP4[.mp4]" },
+
+    { "type": "stat", "durationInFrames": 110, "sfx": "thock",
+      "value": 60, "label": "seconds to a polished trailer", "sub": "from one local repo" },
+
+    { "type": "feature-montage", "durationInFrames": 180, "perItemFrames": 36,
+      "items": [
+        { "icon": "🖥️", "text": "Real UI footage" },
+        { "icon": "✨", "text": "Kinetic text" },
+        { "icon": "🎵", "text": "Music & SFX" },
+        { "icon": "📐", "text": "Deterministic" },
+        { "icon": "🧩", "text": "Any web repo" }
+      ] },
+
+    { "type": "stat", "durationInFrames": 110,
+      "value": "100%", "label": "local-first", "sub": "your code never leaves your machine" },
+
+    { "type": "feature-montage", "durationInFrames": 150, "perItemFrames": 36,
+      "items": [
+        { "icon": "🚀", "text": "npx autodemo" },
+        { "icon": "🎯", "text": "Pick a repo" },
+        { "icon": "📼", "text": "Get an .mp4" }
+      ] },
+
+    { "type": "outro", "durationInFrames": 120, "sfx": "impact",
+      "text": "AutoDemo", "sub": "local-first repo → code trailer", "cta": "npx autodemo" }
+  ]
+}

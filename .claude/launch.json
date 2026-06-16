@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Remotion Studio",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["remotion", "studio", "src/render/index.ts", "--port", "3000"],
+      "port": 3000
+    },
+    {
+      "name": "autodemo-ui",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "scripts/serve.ts", "/tmp/sample-app", "4790"],
+      "port": 4790
+    }
+  ]
+}
