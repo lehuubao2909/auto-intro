@@ -3,7 +3,6 @@ import { useCurrentFrame, useVideoConfig, Sequence } from "remotion";
 import type { Theme } from "../theme.js";
 import { TYPE, seriesColor } from "../theme.js";
 import { SceneFrame } from "../components/scene-frame.js";
-import { GlowPulse } from "../lib/fx.js";
 import { AnimatedLine } from "../components/animated-text.js";
 import { FlowDiagram } from "../components/flow-diagram.js";
 import { KenBurnsImg } from "../components/ken-burns-img.js";
@@ -45,7 +44,6 @@ const MontageCard: React.FC<{ icon: string; text: string; theme: Theme; color?: 
   const c = color ?? theme.accent;
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", gap: 24, alignItems: "center", justifyContent: "center" }}>
-      <GlowPulse theme={theme} color={c} />
       <div style={{ transform: `scale(${s})`, zIndex: 1 }}>
         <Icon name={icon} size={72} color={c} animate={false} />
       </div>

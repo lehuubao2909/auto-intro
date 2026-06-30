@@ -9,7 +9,7 @@ AutoIntro analyzes a local code repository and generates a professional intro vi
 - **Reads the codebase** without installing dependencies (zero risk)
 - **Detects the project's UI** — palette, typography, components, logo
 - **Determines how users interact** with it (CLI tool, SDK, web app, API, mobile, or desktop)
-- **Directs a storyboard** via Gemini — mapping components to animated UI primitives
+- **Directs a storyboard** via Gemini, OpenAI, or Anthropic — mapping components to animated UI primitives
 - **Renders locally** with Remotion + headless Chromium (nothing uploads; everything stays on your machine)
 - **Produces a sharable `.mp4`** in `<repo>/.auto-intro/trailer.mp4`
 
@@ -28,14 +28,14 @@ Watch AutoIntro's own intro video (made with AutoIntro):
 ### Prerequisites
 
 - **Node.js** ≥ 20
-- **Gemini API Key** (free tier available): https://aistudio.google.com/apikey
+- **An LLM API key** — Gemini (default, free tier: https://aistudio.google.com/apikey), OpenAI, or Anthropic
 - ~200 MB disk space (for Remotion's Chromium, downloaded on first render)
 
 ### 1. Install & Configure
 
 ```bash
 # Clone (or integrate into your project)
-git clone https://github.com/lehuubao/auto-intro.git
+git clone https://github.com/lehuubao2909/auto-intro.git
 cd auto-intro
 
 # Install dependencies
@@ -70,10 +70,12 @@ The web UI walks you through:
 - **No Install/Setup Risk** — reads package.json & source, doesn't run `npm install`
 - **Usage-Type Aware** — detects CLI, SDK, web app, API, mobile, or desktop patterns
 - **Design Extraction** — pulls theme colors, fonts, and brand identity from your code
-- **Component Mapping** — translates your real UI components to 42 animated primitives
+- **Component Mapping** — translates your real UI components to 52 animated primitives (incl. editorial layout templates)
+- **Calm, content-first motion** — staggered reveals, depth parallax, word-by-word text; calm static background (no flashy churn)
+- **Accurate by construction** — derives the *real* run command from the repo (never fabricates `npx <name>` for unpublished projects)
 - **Approval Gate** — review + edit the brief before rendering (edit storyboard JSON for advanced power users)
 - **Headless Mode** — `--yes` flag for CI/CD or batch processing
-- **Flexible Models** — swap Gemini models via environment variables
+- **Multi-Provider** — Gemini, OpenAI, or Anthropic; swap provider + models via environment variables
 - **Crash-Safe Rendering** — Remotion boundary wraps rendering; failures don't corrupt artifacts
 
 ## CLI Usage
@@ -111,9 +113,12 @@ All settings can be overridden via environment variables or a `.env` file (auto-
 
 | Variable | Type | Default | Purpose |
 |----------|------|---------|---------|
-| `GEMINI_API_KEY` | string | (required) | Gemini API key for analysis + directing. Get at https://aistudio.google.com/apikey. Also accepts `GOOGLE_API_KEY`. |
-| `AUTOINTRO_DIRECTOR_MODEL` | string | `gemini-3.5-flash` | Model for storyboard synthesis (strongest for this task). |
-| `AUTOINTRO_TRIAGE_MODEL` | string | `gemini-3.1-flash-lite` | Model for repo file skimming (fast, cheap, long-context). |
+| `AUTOINTRO_PROVIDER` | string | `gemini` | LLM provider: `gemini` \| `openai` \| `anthropic`. Picks the default models + which key is required. |
+| `GEMINI_API_KEY` | string | (provider key) | Required when provider is `gemini`. Get at https://aistudio.google.com/apikey. Also accepts `GOOGLE_API_KEY`. |
+| `OPENAI_API_KEY` | string | (provider key) | Required when provider is `openai`. Get at https://platform.openai.com/api-keys. |
+| `ANTHROPIC_API_KEY` | string | (provider key) | Required when provider is `anthropic`. Get at https://console.anthropic.com/settings/keys. |
+| `AUTOINTRO_DIRECTOR_MODEL` | string | per-provider | Storyboard synthesis model. Defaults: gemini `gemini-3.5-flash` · openai `gpt-5.4` · anthropic `claude-opus-4-8`. |
+| `AUTOINTRO_TRIAGE_MODEL` | string | per-provider | Repo-skim model (fast/cheap). Defaults: gemini `gemini-3.1-flash-lite` · openai `gpt-5.4-mini` · anthropic `claude-haiku-4-5`. |
 | `AUTOINTRO_PORT` | number | `0` (auto) | Server port; `0` picks a free port automatically. |
 | `AUTOINTRO_FPS` | number | `30` | Video frames per second. |
 | `AUTOINTRO_WIDTH` | number | `1920` | Video width (pixels). |
@@ -124,12 +129,20 @@ All settings can be overridden via environment variables or a `.env` file (auto-
 | `AUTOINTRO_MAX_FULL_READ` | number | `10` | Max files to fully read during triage (hard cap). |
 | `AUTOINTRO_WORKDIR` | string | `.auto-intro` | Output directory (created in target repo). |
 
-### Example: Custom Model for Higher Accuracy
+### Example: Switch Provider or Model
 
 ```bash
-# Default director is gemini-3.5-flash. Point it at a stronger model for higher
-# accuracy on complex repos (any Gemini text model id your key can access):
-export AUTOINTRO_DIRECTOR_MODEL=gemini-3-pro-preview
+# Use OpenAI instead of Gemini (researched defaults: gpt-5.4 / gpt-5.4-mini):
+export AUTOINTRO_PROVIDER=openai
+export OPENAI_API_KEY=sk-...
+npm run dev -- /path/to/repo
+
+# Or Anthropic (claude-opus-4-8 / claude-haiku-4-5):
+export AUTOINTRO_PROVIDER=anthropic
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# Pin a specific director model on any provider:
+export AUTOINTRO_DIRECTOR_MODEL=gpt-5.5
 npm run dev -- /path/to/repo
 ```
 
@@ -150,7 +163,7 @@ npm run dev -- /path/to/repo
 └────────┬─────────────────────┘
          │
 ┌────────▼──────────────────────┐
-│  4. Direct (Gemini)          │  Generate storyboard with 42 UI primitives
+│  4. Direct (LLM)             │  Generate storyboard with 52 UI primitives
 │     + usage-type flow        │  + themed colors + CTA
 └────────┬───────────────────────┘
          │

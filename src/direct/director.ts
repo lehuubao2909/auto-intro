@@ -1,4 +1,4 @@
-import { generateRawJson } from "../shared/gemini-client.js";
+import { generateRawJson } from "../shared/llm-client.js";
 import { validateStoryboard, type ValidationResult } from "../shared/validate-storyboard.js";
 import { buildDirectorPrompt, buildRepairPrompt } from "./build-director-prompt.js";
 import { scrubDeep } from "../analyze/scrub-secrets.js";
@@ -45,7 +45,7 @@ export async function direct(
   design: DesignProfile,
   inventory: ComponentInventory,
 ): Promise<DirectorResult> {
-  const model = config.gemini.directorModel;
+  const model = config.llm.directorModel;
   const basePrompt = buildDirectorPrompt(brief, design, inventory);
 
   let raw = await generateRawJson(basePrompt, { model, temperature: 0.6 });

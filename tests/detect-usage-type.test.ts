@@ -40,6 +40,42 @@ describe('detectUsageType', () => {
     expect(result.install).toBe('npx my-cli');
   });
 
+  // Accuracy: an UNPUBLISHED CLI (0.0.x / private) must NOT fabricate `npx <name>` —
+  // surface the REAL local run command from scripts instead.
+  it('unpublished CLI (0.0.x) uses the real dev script, not a fabricated npx', () => {
+    const pkgPath = join(tmpDir, 'package.json');
+    writeFileSync(pkgPath, JSON.stringify({
+      name: 'auto-intro',
+      version: '0.0.1',
+      bin: { 'auto-intro': './dist/index.js' },
+      scripts: { dev: 'tsx src/cli/index.ts' },
+    }));
+    const tree: RepoTree = {
+      root: tmpDir,
+      files: [{ relPath: 'package.json', absPath: pkgPath, kind: 'manifest', size: 100 }],
+    };
+    const result = detectUsageType(tree);
+    expect(result.usageType).toBe('cli');
+    expect(result.install).toBe('npm run dev'); // not "npx auto-intro"
+  });
+
+  it('private CLI is treated as unpublished (no npx)', () => {
+    const pkgPath = join(tmpDir, 'package.json');
+    writeFileSync(pkgPath, JSON.stringify({
+      name: 'internal-tool',
+      version: '1.2.0',
+      private: true,
+      bin: { 'internal-tool': './bin.js' },
+      scripts: { start: 'node bin.js' },
+    }));
+    const tree: RepoTree = {
+      root: tmpDir,
+      files: [{ relPath: 'package.json', absPath: pkgPath, kind: 'manifest', size: 100 }],
+    };
+    const result = detectUsageType(tree);
+    expect(result.install).toBe('npm start');
+  });
+
   // CLI with scoped name - regression test for M6 fix
   it('detects scoped CLI and includes scope in install command', () => {
     const pkgPath = join(tmpDir, 'package.json');

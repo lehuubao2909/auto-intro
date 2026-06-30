@@ -24,6 +24,17 @@ describe('ui-kit + primitive-names registry', () => {
       'input-field',
       'button',
       'toggle',
+      // layout templates (v4)
+      'split-hero',
+      'stacked-timeline',
+      'metric-banner',
+      'quote-card',
+      'before-after',
+      'device-mockup-trio',
+      'tab-switcher',
+      'map-pins',
+      'code-to-ui',
+      'feature-spotlight',
     ];
     for (const name of expected) {
       expect(UI_KIT).toHaveProperty(name);
@@ -37,7 +48,7 @@ describe('ui-kit + primitive-names registry', () => {
   });
 
   it('PRIMITIVE_NAMES is readonly and has expected length', () => {
-    expect(PRIMITIVE_NAMES.length).toBe(42);
+    expect(PRIMITIVE_NAMES.length).toBe(52);
   });
 
   it('no extra keys in UI_KIT beyond PRIMITIVE_NAMES', () => {

@@ -29,6 +29,21 @@ const sb = {
       { primitive: "terminal", props: {} },
       { primitive: "chat-bubble", props: { bullets: "x" } },
     ] },
+    // v4 layout templates with MALFORMED props — must not abort
+    { type: "ui-sequence", durationInFrames: 150, caption: "templates (bad props)", steps: [
+      { primitive: "split-hero", props: { title: 1, bullets: "not-an-array" } },
+      { primitive: "metric-banner", props: { metrics: 99 } },
+      { primitive: "feature-spotlight", props: { labels: null } },
+    ] },
+    { type: "ui-bento", durationInFrames: 160, cols: 3, caption: "more templates (bad props)", tiles: [
+      { primitive: "stacked-timeline", props: { steps: "x" } },
+      { primitive: "quote-card", props: {} },
+      { primitive: "before-after", props: { before: 1, after: 2 } },
+      { primitive: "device-mockup-trio", props: { screens: 5 } },
+      { primitive: "tab-switcher", props: { tabs: "no", active: "x" } },
+      { primitive: "code-to-ui", props: { code: 42 } },
+    ] },
+    { type: "ui-showcase", durationInFrames: 120, caption: "map (bad props)", element: { primitive: "map-pins", props: { points: "bad" } } },
     { type: "techstack", durationInFrames: 90, items: [{ name: "TypeScript" }] },
     { type: "stat", durationInFrames: 80, value: "100%", label: "no crash" },
     { type: "outro", durationInFrames: 90, text: "Survived", cta: "ok" },

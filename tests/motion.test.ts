@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { countUp, typewriter, enter, tilt3d, parallax } from '../src/render/lib/motion.js';
+import { countUp, typewriter, enter, tilt3d, stagger, parallaxY, composeEnter, springEnter } from '../src/render/lib/motion.js';
 import type { EnterVariant } from '../src/render/lib/motion.js';
 
 describe('motion helpers', () => {
@@ -354,50 +354,79 @@ describe('motion helpers', () => {
     });
   });
 
-  describe('parallax', () => {
-    it('oscillates based on frame (sine wave)', () => {
-      const vals = [];
-      for (let frame = 0; frame < 360; frame += 30) {
-        vals.push(parallax(frame, 0.5, 30));
+  describe('stagger', () => {
+    it('returns base for index 0 and increases by step', () => {
+      expect(stagger(0, 6, 4)).toBe(6);
+      expect(stagger(1, 6, 4)).toBe(10);
+      expect(stagger(3, 6, 4)).toBe(18);
+    });
+
+    it('is strictly increasing in index (reveal in order)', () => {
+      let prev = stagger(0);
+      for (let i = 1; i < 10; i++) {
+        const cur = stagger(i);
+        expect(cur).toBeGreaterThan(prev);
+        prev = cur;
       }
-      // Sine wave oscillates, so values should vary
-      expect(new Set(vals).size).toBeGreaterThan(1);
-    });
-
-    it('is zero or near-zero at frame 0', () => {
-      expect(Math.abs(parallax(0, 0.5, 30))).toBeLessThan(1);
-    });
-
-    it('scales with depth (0 = no parallax, 1 = full parallax)', () => {
-      const frame = 60;
-      const depth0 = parallax(frame, 0, 30);
-      const depth05 = parallax(frame, 0.5, 30);
-      const depth1 = parallax(frame, 1, 30);
-
-      expect(depth0).toBe(0); // No depth = no parallax
-      expect(Math.abs(depth05)).toEqual(Math.abs(depth1) / 2); // Linear scaling
-    });
-
-    it('scales with amplitude', () => {
-      const frame = 60;
-      const amp30 = parallax(frame, 0.5, 30);
-      const amp60 = parallax(frame, 0.5, 60);
-
-      expect(Math.abs(amp60)).toEqual(Math.abs(amp30) * 2);
     });
 
     it('uses default parameters correctly', () => {
-      const withDefaults = parallax(60);
-      const explicit = parallax(60, 0.5, 30);
-      expect(withDefaults).toBe(explicit);
+      expect(stagger(2)).toBe(stagger(2, 6, 4));
+    });
+  });
+
+  describe('parallaxY', () => {
+    it('is 0 at frame 0 and grows with scene progress', () => {
+      expect(parallaxY(0, 100, 0.3, 40)).toBe(0);
+      expect(parallaxY(50, 100, 0.3, 40)).toBeGreaterThan(0);
+      expect(parallaxY(100, 100, 0.3, 40)).toBeCloseTo(40 * 0.3, 5);
     });
 
-    it('returns a number in reasonable range', () => {
-      for (let frame = 0; frame < 120; frame += 10) {
-        const result = parallax(frame, 1, 100);
-        expect(result).toBeGreaterThanOrEqual(-100);
-        expect(result).toBeLessThanOrEqual(100);
-      }
+    it('scales linearly with depth (deeper foreground moves more)', () => {
+      const bg = parallaxY(100, 100, 0.15, 40);
+      const fg = parallaxY(100, 100, 0.3, 40);
+      expect(fg).toBeCloseTo(bg * 2, 5);
+    });
+
+    it('clamps progress to [0,1] and guards sceneDur=0', () => {
+      expect(parallaxY(999, 100, 0.5, 40)).toBeCloseTo(20, 5); // clamped at p=1
+      expect(parallaxY(50, 0, 0.5, 40)).toBe(0); // no divide-by-zero
+    });
+
+    it('is deterministic (same inputs → same output)', () => {
+      expect(parallaxY(33, 120, 0.3, 40)).toBe(parallaxY(33, 120, 0.3, 40));
+    });
+  });
+
+  describe('composeEnter', () => {
+    it('fades 0→1 and settles transform to identity over dur', () => {
+      const start = composeEnter(0, { dur: 16, slideX: 40, riseY: 28 });
+      const end = composeEnter(16, { dur: 16, slideX: 40, riseY: 28 });
+      expect(start.opacity).toBeLessThanOrEqual(0.05);
+      expect(end.opacity).toBeGreaterThanOrEqual(0.95);
+      expect(end.transform).toContain('translate(0px, 0px)');
+      expect(start.willChange).toContain('transform');
+    });
+
+    it('combines slide-in (X) and rise (Y) at start', () => {
+      const start = composeEnter(0, { dur: 16, slideX: 50, riseY: 30 });
+      expect(start.transform).toContain('50px');
+      expect(start.transform).toContain('30px');
+    });
+  });
+
+  describe('springEnter', () => {
+    it('starts near 0 and approaches 1 (gentle settle)', () => {
+      expect(springEnter(0, 30)).toBeLessThan(0.2);
+      expect(springEnter(60, 30)).toBeGreaterThan(0.9);
+    });
+
+    it('respects delay (no progress before delay)', () => {
+      expect(springEnter(5, 30, 20)).toBeLessThanOrEqual(springEnter(25, 30, 20));
+    });
+
+    it('is deterministic', () => {
+      expect(springEnter(20, 30, 0)).toBe(springEnter(20, 30, 0));
     });
   });
 });

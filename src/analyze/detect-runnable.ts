@@ -48,12 +48,22 @@ function findScreenshots(tree: RepoTree, readmeText: string): string[] {
   return [...out];
 }
 
+// A URL that points at an image/badge/thumbnail, not a live app (e.g. a YouTube
+// thumbnail or a shields.io badge embedded in the README) — never a real "live URL".
+function isImageUrl(u: string): boolean {
+  return IMG_RE.test(u) || /img\.(shields|youtube)\.|\/badge|\.svg(\?|$)/i.test(u);
+}
+
 function findLiveUrl(homepage: string | undefined, readmeText: string): string | undefined {
-  if (homepage && /^https?:\/\//.test(homepage)) return homepage;
-  // README links near "demo"/"live", or known hosts
-  const linkRe = /\[([^\]]*(?:demo|live|app|try)[^\]]*)\]\((https?:\/\/[^)]+)\)/gi;
-  const m = linkRe.exec(readmeText);
-  if (m) return m[2];
+  if (homepage && /^https?:\/\//.test(homepage) && !isImageUrl(homepage)) return homepage;
+  // README links near "demo"/"live"/"app"/"try". The leading `!` group catches nested
+  // image-link markdown `[![alt](img)](url)` — skip those (the captured URL is an image).
+  const linkRe = /(!?)\[([^\]]*(?:demo|live|app|try)[^\]]*)\]\((https?:\/\/[^)]+)\)/gi;
+  let m: RegExpExecArray | null;
+  while ((m = linkRe.exec(readmeText))) {
+    if (m[1] === "!" || isImageUrl(m[3])) continue;
+    return m[3];
+  }
   const host = readmeText.match(/https?:\/\/[^\s)]+\.(?:vercel\.app|netlify\.app|pages\.dev|github\.io)[^\s)]*/i);
   return host?.[0];
 }

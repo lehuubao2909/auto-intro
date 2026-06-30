@@ -23,8 +23,15 @@ The trailer must walk a viewer through HOW SOMEONE USES this product to get a re
 SINGLE core action (from RepoFacts.whatItDoes) and SHOW it happening as a flow: input → process → output.
 Do NOT explain with decorative charts/tables. Skip login/auth/settings/secondary screens entirely.
 
-ARC (target): title → problem → THE CORE FLOW (the hero, 1-2 scenes showing the product used) →
-why-it-matters (feature-montage / a key stat) → techstack → outro. ~10-13 scenes, 45-60s.
+ARC (a STARTING POINT, not a fixed template): title → problem → THE CORE FLOW (the hero, 1-2 scenes
+showing the product used) → why-it-matters (feature-montage / a key stat) → techstack → outro.
+ADAPT the arc, scene mix, and LENGTH to THIS project — a CLI, a data dashboard, an SDK and a content app
+should tell DIFFERENT stories with different scene types. Follow the SCENE BUDGET below (length follows
+content; never pad with filler to reach a number).
+
+PACING (durationInFrames @ fps=30) — keep text scenes SNAPPY, give UI scenes room to read:
+- title ~70 · problem ~80 · stat ~70 · outro ~95 (text scenes: short, they settle fast)
+- ui-sequence ~210-260 · ui-bento/ui-showcase ~170-220 · feature-montage ~180-210 · techstack ~120 · architecture ~160.
 
 SCENE TYPES (durationInFrames are FRAMES at fps=30):
 - title         {text(<=7 words), sub?}
@@ -50,17 +57,24 @@ content/app: card {title, body?, icon?} · feed {items:[{title, meta?}]} · tabl
 commerce: pricing-tiers {tiers:[{name, price, features:string[]}]} · product-card {title, price?, tag?}
 frames (WRAP a child to give context): mobile-frame {children} · browser-window {url?, children}
 layout: panel {children} · bento-grid {} · sidebar-nav {items:[{icon,label}], active}
+layout templates (editorial — great as a ui-showcase element to vary the look; self-contained, no nesting):
+  split-hero {title, body?, bullets?:string[]} · stacked-timeline {steps:[{title, body?}]} · metric-banner {metrics:[{label,value,suffix?}]}
+  · quote-card {quote, author?, role?} · before-after {before, after, label?} · device-mockup-trio {screens?:string[]}
+  · tab-switcher {tabs:string[], active?} · map-pins {points?:[{x,y,label?}]} · code-to-ui {code, lang?, result?} · feature-spotlight {title, labels:string[]}
 
 Fill props with REAL specifics from the brief (actual command/feature/metric names). Use brief.usageType + the FLOW section to pick the hero beat.
 Vary transitionIn across scenes (fade/slide/zoom/push/clip) — not all the same.
 
-RULES: show the core flow EARLY (by ~10s). Variety: never 3 text-only scenes (title/problem/stat/outro) in a row.
+RULES: show the core flow EARLY (by ~10s). Variety: never 3 text-only scenes (title/problem/stat/outro) in a row,
+and vary scene TYPES + transitionIn (don't repeat the same layout). ADAPT to the project: pick scene types that
+fit THIS product (see FLOW + SCENE BUDGET). Do NOT force ui-bento unless it's genuinely a dashboard/analytics
+tool. Do NOT pad with filler scenes to reach a length — a lean 8-scene story beats a padded 13-scene one.
 techstack from the brief. Do NOT set colors/theme (injected). Output JSON ONLY: {"meta":{title,totalSeconds},"scenes":[...]}.`;
 
 const FEWSHOT = `=== EXAMPLE (a CLI tool — STORY-DRIVEN; recreate for the ACTUAL project, don't copy content) ===
 {"meta":{"title":"Shipfast","totalSeconds":48},"scenes":[
- {"type":"title","durationInFrames":100,"text":"Ship in one command.","sub":"Shipfast · deploy any app instantly"},
- {"type":"problem","durationInFrames":100,"lines":["Deploys are slow and fiddly.","Too many steps to go live."]},
+ {"type":"title","durationInFrames":70,"text":"Ship in one command.","sub":"Shipfast · deploy any app instantly"},
+ {"type":"problem","durationInFrames":80,"lines":["Deploys are slow and fiddly.","Too many steps to go live."]},
  {"type":"ui-sequence","durationInFrames":240,"caption":"from one command to live",
   "steps":[{"primitive":"terminal","props":{"command":"npx shipfast deploy","output":["Reading project…"]}},
            {"primitive":"progress-steps","props":{"title":"Shipfast","steps":["Bundle","Optimize","Upload","Go live"]}},
@@ -69,20 +83,34 @@ const FEWSHOT = `=== EXAMPLE (a CLI tool — STORY-DRIVEN; recreate for the ACTU
   "items":[{"icon":"Zap","text":"Zero config"},{"icon":"Globe","text":"Global edge"},{"icon":"Shield","text":"Auto HTTPS"},{"icon":"Activity","text":"Live logs"}]},
  {"type":"ui-showcase","durationInFrames":170,"caption":"watch it roll out",
   "element":{"primitive":"progress-steps","props":{"title":"Rollout","steps":["Build","Deploy to edge","Health check","Done"]}}},
- {"type":"stat","durationInFrames":95,"value":"8s","label":"average deploy","sub":"commit to live"},
+ {"type":"stat","durationInFrames":70,"value":"8s","label":"average deploy","sub":"commit to live"},
  {"type":"techstack","durationInFrames":120,"caption":"built with","items":[{"name":"Node.js"},{"name":"TypeScript"},{"name":"Docker"}]},
- {"type":"outro","durationInFrames":105,"text":"Shipfast","sub":"deploy any app instantly","cta":"shipfast.app"}
+ {"type":"outro","durationInFrames":95,"text":"Shipfast","sub":"deploy any app instantly","cta":"shipfast.app"}
 ]}`;
 
 const USAGE_FLOW: Record<string, string> = {
-  cli: "CLI → hero ui-sequence: terminal(the real command) → progress-steps(what runs) → card(result).",
-  sdk: "SDK → hero ui-sequence: code-snippet(real import/usage from howItsUsed) → card(the outcome). Do NOT show a terminal install unless that's truly how it's used.",
-  library: "Library → code-snippet of the API in use → card(outcome).",
-  "web-app": "Web app → hero ui-sequence of the MAIN feature: input/action → working surface → result. Skip auth/settings.",
-  api: "API → ui-sequence: input-field/terminal(a request) → card/table(the JSON response).",
-  mobile: "Mobile → main-flow screens (use card/feed/stat tiles); keep it the core feature.",
-  desktop: "Desktop → main window + core action as a ui-sequence.",
-  unknown: "Infer the single core action and show it input → result.",
+  cli: "CLI → hero ui-sequence: terminal(the real command) → progress-steps(what runs) → card(result). Favor: code-to-ui, stacked-timeline (the steps). AVOID dashboards/ui-bento.",
+  sdk: "SDK → hero is code-to-ui (real import/usage from howItsUsed → rendered result), or code-snippet → card. Do NOT show a terminal install unless that's truly how it's used. AVOID ui-bento.",
+  library: "Library → code-to-ui / code-snippet of the API in use → card(outcome). Favor: stacked-timeline, feature-spotlight. AVOID dashboards.",
+  "web-app": "Web app → hero ui-sequence of the MAIN feature: input/action → working surface → result. Skip auth/settings. Favor: split-hero (landing beat), feature-spotlight. Use ui-bento ONLY if it's genuinely a dashboard/analytics tool.",
+  api: "API → ui-sequence: input-field/terminal(a request) → card/table(the JSON response), or code-to-ui (request → response). Favor: metric-banner for throughput stats.",
+  mobile: "Mobile → device-mockup-trio for the key screens, or a main-flow with card/feed/stat tiles. Favor: map-pins if location-based. Keep it the core feature.",
+  desktop: "Desktop → main window + core action as a ui-sequence. Favor: split-hero, feature-spotlight.",
+  unknown: "Infer the single core action and show it input → result. Favor split-hero / stacked-timeline / feature-spotlight to frame it.",
+};
+
+/** Content-richness signal → drives scene budget + length. From the inventory size. */
+type Richness = "sparse" | "moderate" | "rich";
+function richnessOf(inventory: ComponentInventory): Richness {
+  const n = inventory.items?.length ?? 0;
+  if (n <= 4) return "sparse";
+  if (n <= 9) return "moderate";
+  return "rich";
+}
+const SCENE_BUDGET: Record<Richness, string> = {
+  sparse: "SPARSE → 7-9 scenes, ~45s. Lean: one strong hero flow; skip optional architecture/extra UI scenes. Better short than padded.",
+  moderate: "MODERATE → 9-11 scenes, ~50-54s: hero flow + 1-2 supporting UI scenes + montage/stat.",
+  rich: "RICH → 11-14 scenes, ~56-60s: hero flow + multiple UI surfaces (sequence/bento/showcase) + montage + stat + (optional) architecture.",
 };
 
 export function buildDirectorPrompt(brief: ProjectBrief, design: DesignProfile, inventory: ComponentInventory): string {
@@ -103,6 +131,10 @@ export function buildDirectorPrompt(brief: ProjectBrief, design: DesignProfile, 
     USAGE_FLOW[brief.usageType] ?? USAGE_FLOW.unknown,
     "Ground every prop in the brief (real features/usage). Use brief.suggestedBeats as the story spine.",
     ctaRule,
+    "",
+    "=== SCENE BUDGET for THIS project (length follows content — do NOT pad to a number) ===",
+    `Detected richness: ${richnessOf(inventory)} (${inventory.items?.length ?? 0} component surfaces in the inventory).`,
+    SCENE_BUDGET[richnessOf(inventory)],
     "",
     "=== COMPONENT INVENTORY (hints for which surfaces exist) ===",
     inv || "  (none — infer the core flow from the brief)",

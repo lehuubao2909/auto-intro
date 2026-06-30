@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "title": "AutoIntro", "fps": 30, "width": 1920, "height": 1080,
+    "theme": "cinematic-dark", "accent": "#41A3EF", "accent2": "#FCCE50", "totalSeconds": 48,
+    "design": {
+      "mode": "dark", "glass": true, "radius": 16, "font": "Inter",
+      "palette": { "bg": "#080B12", "surface": "#121A2A", "text": "#F4F7FB", "dim": "#9AA7B8", "accent": "#41A3EF", "accent2": "#FCCE50" }
+    }
+  },
+  "scenes": [
+    { "type": "title", "durationInFrames": 80, "transitionIn": "zoom", "sfx": "whoosh",
+      "text": "Your repo is the pitch.", "sub": "AutoIntro · turn any codebase into a 60-second intro" },
+
+    { "type": "problem", "durationInFrames": 90, "transitionIn": "fade",
+      "lines": ["Great work ships with a rushed demo — or none.", "Agents, CLIs and APIs have no UI to record."] },
+
+    { "type": "ui-sequence", "durationInFrames": 240, "transitionIn": "slide", "sfx": "tick",
+      "caption": "One local command — code in, video out",
+      "steps": [
+        { "primitive": "terminal", "props": { "command": "npm run dev -- .", "output": ["Reading your project…", "✓ CLI · 52 UI primitives", "Directing the story…"] } },
+        { "primitive": "progress-steps", "props": { "title": "AutoIntro", "steps": ["Analyze repo", "Extract design", "Direct storyboard", "Render with Remotion"] } },
+        { "primitive": "card", "props": { "title": "intro.mp4 — ready", "body": "48s · 1080p · rendered locally", "icon": "Play" } }
+      ] },
+
+    { "type": "ui-showcase", "durationInFrames": 190, "transitionIn": "push",
+      "caption": "It understands how your project is actually used",
+      "element": { "primitive": "code-to-ui", "props": { "code": "import { track } from \"trackly\";\n\ntrack(\"signup\", { plan: \"pro\" });", "lang": "ts", "result": "✓ Live event captured" } } },
+
+    { "type": "ui-showcase", "durationInFrames": 200, "transitionIn": "zoom", "sfx": "riser",
+      "caption": "How it works",
+      "element": { "primitive": "stacked-timeline", "props": { "steps": [
+        { "title": "Analyze", "body": "Read the code, detect how it's used" },
+        { "title": "Direct", "body": "Map real UI to animated motion primitives" },
+        { "title": "Render", "body": "Remotion → MP4, 100% on your machine" }
+      ] } } },
+
+    { "type": "feature-montage", "durationInFrames": 180, "transitionIn": "clip", "perItemFrames": 36,
+      "items": [
+        { "icon": "Wand2", "text": "Recreates your UI" },
+        { "icon": "Shield", "text": "No screen recording" },
+        { "icon": "Sparkles", "text": "Themed to your brand" },
+        { "icon": "Zap", "text": "52 motion primitives" },
+        { "icon": "Lock", "text": "100% local" }
+      ] },
+
+    { "type": "ui-showcase", "durationInFrames": 170, "transitionIn": "push",
+      "caption": "Proof in numbers",
+      "element": { "primitive": "metric-banner", "props": { "metrics": [
+        { "label": "UI primitives", "value": 52 },
+        { "label": "Uploads", "value": 0 },
+        { "label": "Intro length", "value": 48, "suffix": "s" }
+      ] } } },
+
+    { "type": "stat", "durationInFrames": 75, "transitionIn": "zoom", "sfx": "thock",
+      "value": "0", "label": "bytes of your code uploaded", "sub": "everything runs on your machine" },
+
+    { "type": "techstack", "durationInFrames": 120, "transitionIn": "fade", "caption": "built with",
+      "items": [ { "name": "TypeScript" }, { "name": "Remotion" }, { "name": "React" }, { "name": "Gemini" }, { "name": "Fastify" } ] },
+
+    { "type": "outro", "durationInFrames": 100, "transitionIn": "zoom", "sfx": "impact",
+      "text": "AutoIntro", "sub": "Your repository, introduced.", "cta": "npm run dev --" }
+  ]
+}

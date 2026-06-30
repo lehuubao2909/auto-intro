@@ -51,6 +51,17 @@ export const PRIMITIVE_NAMES = [
   "form",
   "step-wizard",
   "comparison",
+  // --- layout templates (10) — compositional/editorial, motion-aware ---
+  "split-hero",
+  "stacked-timeline",
+  "metric-banner",
+  "quote-card",
+  "before-after",
+  "device-mockup-trio",
+  "tab-switcher",
+  "map-pins",
+  "code-to-ui",
+  "feature-spotlight",
 ] as const;
 
 export type PrimitiveName = (typeof PRIMITIVE_NAMES)[number];

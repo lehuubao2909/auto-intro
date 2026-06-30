@@ -13,6 +13,7 @@ import { MobileFrame, BrowserWindow } from "./frames.js";
 import { CodeSnippet, ApiExchange, LogStream, FileTree, CodeDiff, CommandPalette } from "./dev.js";
 import { WorldMap, Sparkline, MetricGrid, Gauge, Leaderboard, Heatmap } from "./data-extra.js";
 import { Feed, Calendar, ProfileCard, NotificationToast, PricingTiers, ProductCard, SettingsList, Tabs, Modal, Form, StepWizard, Comparison } from "./surfaces.js";
+import { SplitHero, StackedTimeline, MetricBanner, QuoteCard, BeforeAfter, DeviceMockupTrio, TabSwitcher, MapPins, CodeToUi, FeatureSpotlight } from "./templates.js";
 import { PRIMITIVE_NAMES, type PrimitiveName } from "../../shared/primitive-names.js";
 
 // Director-facing primitives (keys MUST match shared PRIMITIVE_NAMES). `panel-header`
@@ -65,6 +66,17 @@ export const UI_KIT: Record<PrimitiveName, React.ComponentType<any>> = {
   form: Form,
   "step-wizard": StepWizard,
   comparison: Comparison,
+  // --- layout templates ---
+  "split-hero": SplitHero,
+  "stacked-timeline": StackedTimeline,
+  "metric-banner": MetricBanner,
+  "quote-card": QuoteCard,
+  "before-after": BeforeAfter,
+  "device-mockup-trio": DeviceMockupTrio,
+  "tab-switcher": TabSwitcher,
+  "map-pins": MapPins,
+  "code-to-ui": CodeToUi,
+  "feature-spotlight": FeatureSpotlight,
 };
 
 export { PRIMITIVE_NAMES };
@@ -80,4 +92,6 @@ export {
   WorldMap, Sparkline, MetricGrid, Gauge, Leaderboard, Heatmap,
   Feed, Calendar, ProfileCard, NotificationToast, PricingTiers, ProductCard,
   SettingsList, Tabs, Modal, Form, StepWizard, Comparison,
+  SplitHero, StackedTimeline, MetricBanner, QuoteCard, BeforeAfter,
+  DeviceMockupTrio, TabSwitcher, MapPins, CodeToUi, FeatureSpotlight,
 };

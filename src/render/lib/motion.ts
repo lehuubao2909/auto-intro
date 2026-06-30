@@ -1,10 +1,11 @@
-import { interpolate, Easing } from "remotion";
+import { interpolate, spring, Easing } from "remotion";
 import type React from "react";
 
 /**
- * Reusable, deterministic motion helpers (frame-driven). Entrance VARIANTS return a
- * CSS style; plus count-up / typewriter / tilt / parallax. Used to make motion varied
- * and expressive (not just cross-fades). No Date/random (Remotion-safe).
+ * Reusable, deterministic ELEMENT-motion helpers (frame-driven). Entrance VARIANTS return
+ * a CSS style; plus stagger / composable entrance / depth parallax / spring / count-up /
+ * typewriter / tilt. Sits ABOVE the scene-level easing base in `timing.ts`. Used to put the
+ * animation budget into content (text + UI). No Date/random (Remotion-safe).
  */
 
 export type EnterVariant = "fade-up" | "scale" | "blur" | "clip-left" | "clip-up" | "spring-pop" | "rise";
@@ -53,7 +54,45 @@ export function tilt3d(frame: number, start = 0, dur = 24, deg = 8): string {
   return `perspective(1200px) rotateX(${(1 - t) * deg}deg) rotateY(${(1 - t) * -deg}deg)`;
 }
 
-/** Parallax offset (px) for a layer of given depth (0..1), drifting with frame. */
-export function parallax(frame: number, depth = 0.5, amp = 30): number {
-  return Math.sin(frame / 60) * amp * depth;
+// --- P02: stagger · composable entrance · depth parallax · spring ----------
+
+/** Per-item entrance start frame — reveal in ORDER, not all at once. */
+export function stagger(i: number, base = 6, step = 4): number {
+  return base + i * step;
+}
+
+/**
+ * Composable entrance: fade ∘ slide-in ∘ parallax-rise → ONE style. Combine on any
+ * element. `slideX` slides in from a side (px), `riseY` is the upward parallax-rise (px).
+ */
+export function composeEnter(
+  frame: number,
+  opts: { start?: number; dur?: number; slideX?: number; riseY?: number } = {},
+): React.CSSProperties {
+  const { start = 0, dur = 16, slideX = 0, riseY = 28 } = opts;
+  const t = out(frame, start, dur);
+  return {
+    opacity: t,
+    transform: `translate(${(1 - t) * slideX}px, ${(1 - t) * riseY}px)`,
+    willChange: "transform, opacity",
+  };
+}
+
+/**
+ * Real depth parallax: layers at different `depth` (0..1) move at different rates over the
+ * scene's progress. Keep subtle — depth ~0.15 (bg) / 0.3 (mid) / 0.5 (foreground).
+ */
+export function parallaxY(frame: number, sceneDur: number, depth = 0.3, amp = 40): number {
+  const p = sceneDur > 0 ? Math.min(1, Math.max(0, frame / sceneDur)) : 0;
+  return p * amp * depth;
+}
+
+/** Guarded spring entrance 0→1 — gentle config (mild settle; suits a flat/corporate feel). */
+export function springEnter(
+  frame: number,
+  fps: number,
+  delay = 0,
+  config: { damping?: number; stiffness?: number; mass?: number } = { damping: 30, stiffness: 60 },
+): number {
+  return spring({ frame: frame - delay, fps, config });
 }

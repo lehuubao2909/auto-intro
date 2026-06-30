@@ -21,9 +21,9 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  if (!config.gemini.apiKey) {
-    console.warn("⚠  GEMINI_API_KEY not set — analysis/director will use the offline fallback.");
-    console.warn("   Set it (or a .env file) for best results: https://aistudio.google.com/apikey\n");
+  if (!config.llm.apiKey) {
+    console.warn(`⚠  No API key for provider "${config.llm.provider}" — analysis/director will use the offline fallback.`);
+    console.warn("   Set the provider's key (or a .env file) for best results. See README → Environment Configuration.\n");
   }
 
   // Headless one-shot: analyze → brief → render with no approval gate.
@@ -39,7 +39,7 @@ async function main(): Promise<void> {
 
   console.log(`\n  AutoIntro running:  ${url}`);
   console.log(`  Target repo:       ${repoRoot}`);
-  console.log(`  Director / triage: ${config.gemini.directorModel} / ${config.gemini.triageModel}`);
+  console.log(`  Director / triage: ${config.llm.directorModel} / ${config.llm.triageModel}`);
   console.log(`  Flow: Analyze → review brief → approve → render  (add --yes to skip the gate)\n`);
   console.log("  (Ctrl+C to stop)\n");
 

@@ -104,6 +104,13 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${to(r)}${to(g)}${to(b)}`;
 }
 
+/** Rotate a #rrggbb hex's hue by `deg`, keeping S/L. Single source of hue math (reused
+ *  by the background); built on the tested hexToHsl/hslToHex so the two can't drift. */
+export function shiftHue(hex: string, deg: number): string {
+  const { h, s, l } = hexToHsl(hex);
+  return hslToHex(h + deg, s, l);
+}
+
 /**
  * 6 harmonious hues rotated off the accent. Accent (index 0) and accent2 (index 5)
  * are kept verbatim so brand colors stay exact; the middle four rotate the wheel

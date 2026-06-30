@@ -3,9 +3,8 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import type { Theme } from "../theme.js";
 import { TYPE } from "../theme.js";
 import { SceneFrame } from "../components/scene-frame.js";
-import { AnimatedLine } from "../components/animated-text.js";
+import { AnimatedLine, AnimatedWords, MaskedReveal } from "../components/animated-text.js";
 import { KenBurnsImg } from "../components/ken-burns-img.js";
-import { GlowPulse, ParticleBurst } from "../lib/fx.js";
 import { pop } from "../lib/timing.js";
 import type { Scene } from "../../shared/storyboard-schema.js";
 
@@ -23,14 +22,10 @@ export const Title: React.FC<{ scene: S<"title">; theme: Theme; mediaSrc?: strin
         <KenBurnsImg src={mediaSrc} durationInFrames={scene.durationInFrames} theme={theme} />
       </div>
     ) : null}
-    <GlowPulse theme={theme} />
-    <ParticleBurst theme={theme} start={4} count={20} />
     <div style={{ display: "flex", flexDirection: "column", gap: 24, alignItems: "center", zIndex: 1 }}>
-      <AnimatedLine size={TYPE.hero} color={theme.text} weight={800}>
-        {scene.text}
-      </AnimatedLine>
+      <AnimatedWords text={scene.text} size={TYPE.hero} color={theme.text} weight={800} />
       {scene.sub ? (
-        <AnimatedLine delay={8} size={TYPE.label} color={theme.accent} weight={600}>
+        <AnimatedLine delay={10} size={TYPE.label} color={theme.accent} weight={600}>
           {scene.sub}
         </AnimatedLine>
       ) : null}
@@ -40,13 +35,15 @@ export const Title: React.FC<{ scene: S<"title">; theme: Theme; mediaSrc?: strin
 
 export const Problem: React.FC<{ scene: S<"problem">; theme: Theme }> = ({ scene, theme }) => (
   <SceneFrame theme={theme} durationInFrames={scene.durationInFrames} transitionIn={scene.transitionIn}>
-    <div style={{ display: "flex", flexDirection: "column", gap: 28, alignItems: "center" }}>
-      {scene.lines.map((line, i) => (
-        <AnimatedLine key={i} delay={i * 10} size={TYPE.h1} color={i === 0 ? theme.text : theme.textDim} weight={700}>
-          {line}
-        </AnimatedLine>
-      ))}
-    </div>
+    <MaskedReveal
+      lines={scene.lines}
+      colors={scene.lines.map((_, i) => (i === 0 ? theme.text : theme.textDim))}
+      color={theme.text}
+      size={TYPE.h1}
+      weight={700}
+      step={10}
+      gap={28}
+    />
   </SceneFrame>
 );
 
@@ -58,8 +55,6 @@ export const Stat: React.FC<{ scene: S<"stat">; theme: Theme }> = ({ scene, them
   const display = isNum ? Math.round((scene.value as number) * Math.min(1, s)).toString() : String(scene.value);
   return (
     <SceneFrame theme={theme} durationInFrames={scene.durationInFrames} transitionIn={scene.transitionIn}>
-      <GlowPulse theme={theme} />
-      <ParticleBurst theme={theme} start={2} count={22} />
       <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center", zIndex: 1 }}>
         <div style={{ fontSize: 180, fontWeight: 900, color: theme.accent, transform: `scale(${0.8 + s * 0.2})` }}>
           {display}
@@ -84,11 +79,9 @@ export const Outro: React.FC<{ scene: S<"outro">; theme: Theme }> = ({ scene, th
   return (
     <SceneFrame theme={theme} durationInFrames={scene.durationInFrames} transitionIn={scene.transitionIn}>
       <div style={{ display: "flex", flexDirection: "column", gap: 22, alignItems: "center" }}>
-        <AnimatedLine size={TYPE.hero} color={theme.text} weight={800}>
-          {scene.text}
-        </AnimatedLine>
+        <AnimatedWords text={scene.text} size={TYPE.hero} color={theme.text} weight={800} />
         {scene.sub ? (
-          <AnimatedLine delay={8} size={TYPE.body} color={theme.textDim} weight={500}>
+          <AnimatedLine delay={10} size={TYPE.body} color={theme.textDim} weight={500}>
             {scene.sub}
           </AnimatedLine>
         ) : null}

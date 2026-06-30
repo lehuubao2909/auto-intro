@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { RepoTree } from "../analyze/walk-repo.js";
 import { pickComponentFiles, fileDigest } from "./pick-component-files.js";
 import { scrubSecrets } from "../analyze/scrub-secrets.js";
-import { generateRawJson } from "../shared/gemini-client.js";
+import { generateRawJson } from "../shared/llm-client.js";
 import { config } from "../shared/config.js";
 import { PRIMITIVE_NAMES, type PrimitiveName } from "../shared/primitive-names.js";
 import { ComponentInventory, type ComponentInventory as Inventory } from "../shared/types.js";
@@ -17,7 +17,7 @@ import { ComponentInventory, type ComponentInventory as Inventory } from "../sha
 // loose: primitive is a free string; we coerce afterward
 const LooseItem = z.object({ kind: z.string(), primitive: z.string(), label: z.string(), source: z.string().optional() });
 
-/** Accept either {items:[...]} or a bare [...] (Gemini varies); → array of loose items. */
+/** Accept either {items:[...]} or a bare [...] (providers vary); → array of loose items. */
 function normalizeItems(raw: string): z.infer<typeof LooseItem>[] {
   const parsed = JSON.parse(raw) as unknown;
   const arr = Array.isArray(parsed)
@@ -56,7 +56,7 @@ function coerce(name: string): PrimitiveName | null {
 }
 
 export async function classifyComponents(tree: RepoTree): Promise<Inventory | null> {
-  if (!config.gemini.apiKey) return null;
+  if (!config.llm.apiKey) return null;
   const files = pickComponentFiles(tree);
   if (files.length === 0) return null;
 
@@ -78,7 +78,7 @@ export async function classifyComponents(tree: RepoTree): Promise<Inventory | nu
 
   let loose: z.infer<typeof LooseItem>[];
   try {
-    const raw = await generateRawJson(prompt, { model: config.gemini.triageModel, temperature: 0.3 });
+    const raw = await generateRawJson(prompt, { model: config.llm.triageModel, temperature: 0.3 });
     loose = normalizeItems(raw);
   } catch {
     return null;

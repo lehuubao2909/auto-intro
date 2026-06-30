@@ -1,8 +1,8 @@
-# AutoDemo — System Architecture
+# AutoDemo — System Architecture (v4)
 
-## Pipeline Overview (v3)
+## Pipeline Overview (v3 + v4 enhancements)
 
-AutoDemo v3 operates as a **two-stage human-gated pipeline** with 4 internal phases. Stage A (analyze → brief) stops for human review; Stage B (approve → render) executes after approval.
+AutoDemo v3 + v4 operates as a **two-stage human-gated pipeline** with 4 internal phases. Stage A (analyze → brief) stops for human review; Stage B (approve → render) executes after approval.
 
 ```
 STAGE A: ANALYSIS (stops for approval)      STAGE B: RENDER (approve → render)
@@ -10,17 +10,19 @@ Phase 1: ANALYZE         Phase 2: INSPECT   ─── Brief Review (Human) ─�
 ┌──────────────────┐  ┌──────────────┐  POST /api/brief             ┌──────────────┐    ┌──────────────────┐
 │ repo-facts.json  │─▶│ design +     │────▶ (review/edit) ────────▶│ storyboard   │───▶│ trailer.mp4      │
 │ (RepoFacts)      │  │ inventory    │  GET /api/brief        │     │ (Storyboard) │    │ (video file)     │
-│ (with usageType) │  │ + brief.json │  POST /api/approve     │     │ (UI-kit 42)  │    │ (+motion/FX)     │
-└──────────────────┘  └──────────────┘                         │     └──────────────┘    └──────────────────┘
-  analyze/             inspect-ui/                             │       direct/            render/
-  (detect-usage-type)  brief/                  (CLI: --yes skips gate; server: web UI)   (RenderBoundary)
+│ (with usageType) │  │ + brief.json │  POST /api/approve     │     │ (UI-kit 52)  │    │ (+calm bg,      │
+└──────────────────┘  └──────────────┘                         │     │ stagger,     │    │ rich motion)     │
+  analyze/             inspect-ui/                             │     │ parallax)    │    │ (RenderBoundary)│
+  (detect-usage-type)  brief/                  (CLI: --yes skips gate; server: web UI)   └──────────────────┘
 ```
 
-**v3 Key Changes:**
+**v3+v4 Key Changes:**
 - **Two-stage gate:** Pipeline splits at brief (stage A ends) with server routes `/api/analyze`, `/api/brief` (GET/POST), `/api/approve`.
 - **usageType detection** (cli, sdk, library, web-app, api, mobile, desktop, unknown) → drives flow templates in Director.
-- **42 UI-kit primitives** (up from 14): panels (3), charts (4), chrome (3), interaction (4), frames (2), dev (6), data-extra (6), surfaces (12).
-- **Rich motion/FX:** `lib/motion.ts` variants (fade-up, scale, blur, clip, spring-pop, rise), `lib/fx.tsx` effects (DrawPath, ShimmerSweep, ScanLine, ParticleBurst, GlowPulse).
+- **52 UI-kit primitives** (up from 42 in v3, 14 in v2): panels (3), charts (4), chrome (3), interaction (4), frames (2), dev (6), data-extra (6), surfaces (12), **layout-templates (10)**.
+- **v4 Motion Core:** `stagger()`, `composeEnter()` (fade∘slide∘parallax), `parallaxY()` (depth), `springEnter()`; removed old sine-drift.
+- **v4 Text:** `AnimatedWords` (word-by-word stagger), `MaskedReveal` (overflow-hidden wipe-up).
+- **v4 Background:** Near-flat (solid + static soft glow + low-opacity grid); hue varies moderately per section only; decorative FX (ScanLine, ParticleBurst, etc.) opt-in only.
 - **Crash-safety:** `RenderBoundary` error boundary wraps scenes + elements; malformed LLM props degrade gracefully.
 - **Conditional CTA:** Director picks a real URL or falls back to tagline (no fabricated links).
 
@@ -181,13 +183,13 @@ type ProjectBrief = {
 **Input:** APPROVED `ProjectBrief` + `DesignProfile` + `ComponentInventory`  
 **Output:** Valid `Storyboard` JSON (→ `.autodemo/storyboard.json`)
 
-**STAGE B begins.** Director consumes the **approved brief** (not raw RepoFacts) and builds a storyboard. Prompt includes **flow template** matched to brief's `usageType` (e.g., CLI → terminal + progress + card; API → request/response; web-app → core action). CTA is conditional: real URL from brief.links or tagline (no invention).
+**STAGE B begins.** Director consumes the **approved brief** (not raw RepoFacts) and builds a storyboard. Prompt includes **flow template** matched to brief's `usageType` (e.g., CLI → terminal + progress + card; API → request/response; web-app → core action). **v4:** Storyboard adapts per project — content richness (ComponentInventory size) drives scene budget + length band (sparse 7–9/~45s, moderate 9–11/~50–54s, rich 11–14/~56–60s); per-usageType story shapes; explicit PACING (text scenes snappy: title~70/problem~80/stat~70/outro~95). CTA is conditional: real URL from brief.links or tagline (no invention).
 
 ### Modules
 | Module | Purpose |
 |--------|---------|
-| `build-director-prompt.ts` | Synthesize few-shot prompt: approved brief (not facts) + design/inventory + 42-primitive registry + flow template per usageType + story rules. Tagline-only CTA if no real URL. |
-| `director.ts` | Call Gemini (configurable model, default gemini-3.5-flash, temp 0.6), validate, repair loop (≤2 retries). Returns storyboard with UI-kit scenes (42 primitives). |
+| `build-director-prompt.ts` | Synthesize few-shot prompt: approved brief (not facts) + design/inventory + 52-primitive registry + flow template per usageType + story rules. **v4:** Includes adaptive budgeting (content-richness → scene count + length), per-type story shapes, explicit pacing rules. Tagline-only CTA if no real URL. |
+| `director.ts` | Call Gemini (configurable model, default gemini-3.5-flash, temp 0.6), validate, repair loop (≤2 retries). Returns storyboard with UI-kit scenes (52 primitives + templates). |
 
 ### Flow: Generate → Validate → Repair Loop
 ```
@@ -222,10 +224,10 @@ generateRawJson(prompt)
 
 ## Phase 4: Render (render/)
 
-**Input:** Storyboard JSON (with 42 UI-kit primitives) + DesignProfile  
+**Input:** Storyboard JSON (with 52 UI-kit primitives + templates) + DesignProfile  
 **Output:** `trailer.mp4` (→ `.autodemo/trailer.mp4`)
 
-Remotion renderer composes scenes by dispatching on scene type. **UI-recreation scenes** render animated vector primitives from the `ui-kit` registry, themed from `DesignProfile`. **Crash-safety:** `RenderBoundary` wraps every scene + element; if a primitive throws (malformed LLM props), it degrades to blank instead of aborting the entire render.
+Remotion renderer composes scenes by dispatching on scene type. **UI-recreation scenes** render animated vector primitives from the `ui-kit` registry, themed from `DesignProfile`. **v4 background:** Near-flat design with solid base + static soft glow + low-opacity grid; hue varies per section only. **v4 motion:** Stagger, combined fade∘slide∘parallax, depth parallax, spring enter on UI heroes. Text uses word-by-word stagger or masked wipe-up reveals. **Crash-safety:** `RenderBoundary` wraps every scene + element; if a primitive throws (malformed LLM props), it degrades to blank instead of aborting the entire render.
 
 ### Modules
 | Module | Purpose |
@@ -239,11 +241,12 @@ Remotion renderer composes scenes by dispatching on scene type. **UI-recreation 
 | `scenes/media-scenes.tsx` | Render `ui` (stills), `demo` (clips) if present (legacy support). |
 | `scenes/graphics-scenes.tsx` | Render `feature-montage`, `techstack` (cards, badges). |
 | `scenes/code-scene.tsx` | Render `code` (syntax-highlighted snippet). |
-| `ui-kit/index.ts` | **42-primitive registry:** Map primitive name (string from schema) to React component. |
-| `ui-kit/{panels,charts,chrome,interaction,frames,dev,data-extra,surfaces}.tsx` | **42 animated vector primitives** (organized by category). Each applies motion + optional FX + theme. Defensive prop defaults for LLM robustness. |
-| `lib/motion.ts` | **v3:** Reusable motion helpers: `enter()` variants (fade-up, scale, blur, clip-left, clip-up, spring-pop, rise), `countUp()`, `typewriter()`, `tilt3d()`, `parallax()`. Frame-driven, Remotion-safe. |
-| `lib/fx.tsx` | **v3:** Visual FX components: `DrawPath` (SVG path reveal), `ShimmerSweep` (glass shine), `ScanLine` (tech texture), `ParticleBurst` (beat FX), `GlowPulse` (soft halo). |
-| `background/scene-background.tsx` | Particle/glow/light-rays/grid backgrounds, themed. Particle count modest for render perf. |
+| `ui-kit/index.ts` | **52-primitive registry:** Map primitive name (string from schema) to React component. |
+| `ui-kit/{panels,charts,chrome,interaction,frames,dev,data-extra,surfaces}.tsx` | **42 core animated vector primitives** (organized by category). Each applies motion + optional FX + theme. Defensive prop defaults for LLM robustness. |
+| **`ui-kit/templates.tsx`** | **v4 NEW: 10 layout-template primitives** (split-hero, stacked-timeline, metric-banner, quote-card, before-after, device-mockup-trio, tab-switcher, map-pins, code-to-ui, feature-spotlight). Self-contained, prop-guarded, motion-aware. |
+| `lib/motion.ts` | **v4:** Reusable motion helpers: `stagger()`, `composeEnter()` (fade∘slide∘parallax), `parallaxY()` (depth parallax), `springEnter()` (gentle spring). Legacy: `countUp()`, `typewriter()`, `tilt3d()`. Frame-driven, Remotion-safe. |
+| `lib/fx.tsx` | **v3:** Visual FX components: `DrawPath` (SVG path reveal), `ShimmerSweep` (glass shine), `ScanLine` (tech texture), `ParticleBurst` (beat FX), `GlowPulse` (soft halo). **v4:** Now opt-in, not painted globally. |
+| `background/scene-background.tsx` | **v4:** Near-flat design (solid base + static soft glow + low-opacity grid). Hue varies moderately per section. No frame-animated multi-treatment. Modest particle count for perf. |
 | `icons/icon.tsx` | Lucide + simple-icons (no emoji). |
 | `components/*.tsx` | Browser frame, code block, animated text, flow diagram, Ken-Burns. |
 | `lib/parse-mermaid.ts` | Deterministic Mermaid parser (no puppeteer; returns SVG). |
@@ -305,10 +308,11 @@ interface RenderOptions {
 | **`ui-bento`** | **tiles (PrimitiveElement[]), cols?, sidebar?, caption?** | **4–5s** | **v2: Dashboard-style grid of primitives (3–6 tiles). Optional sidebar.** |
 | **`ui-sequence`** | **steps (PrimitiveElement[]), caption?** | **3–4s** | **v2: A few UI primitives revealed in sequence (2–3 steps).** |
 
-### UI-Kit Primitive Registry (v3: 42 Primitives)
+### UI-Kit Primitive Registry (v4: 52 Primitives)
 
-**42 named vector primitives** organized by category (scene types `ui-showcase`/`ui-bento`/`ui-sequence` invoke these by name):
+**52 named vector primitives** organized by category (scene types `ui-showcase`/`ui-bento`/`ui-sequence` invoke these by name):
 
+**Core 42 (v3):**
 ```json
 {
   "primitive": "panel" | "card" | "bento-grid" |                        // panels (3)
@@ -324,7 +328,9 @@ interface RenderOptions {
 }
 ```
 
-Each primitive is a React component in `src/render/ui-kit/{panels,charts,chrome,interaction,frames,dev,data-extra,surfaces}.tsx`. All animate with **motion variants** + **optional FX** + glassmorphic styling from `DesignProfile`. Registry in `src/render/ui-kit/index.ts` keyed by `src/shared/primitive-names.ts`.
+**New v4 Layout Templates (10):** split-hero, stacked-timeline, metric-banner, quote-card, before-after, device-mockup-trio, tab-switcher, map-pins, code-to-ui, feature-spotlight. Self-contained, motion-aware.
+
+Each primitive is a React component in `src/render/ui-kit/{panels,charts,chrome,interaction,frames,dev,data-extra,surfaces}.tsx` + `templates.tsx`. All animate with **motion variants** + **optional FX** + glassmorphic styling from `DesignProfile`. Registry in `src/render/ui-kit/index.ts` keyed by `src/shared/primitive-names.ts`.
 
 ### Common Fields
 All scenes share:
@@ -370,7 +376,7 @@ bg?: string;                        // override background
 │  │ - Flow template per usageType          │   │ - Motion/FX layers      │ │
 │  │ - Conditional CTA (URL or tagline)     │   │ - RenderBoundary safety  │ │
 │  │ - Validate + repair loop               │   │ - Render to .mp4         │ │
-│  │ → storyboard.json (UI-kit 42 specs)    │   │ → trailer.mp4            │ │
+│  │ → storyboard.json (UI-kit 52 specs)    │   │ → trailer.mp4            │ │
 │  └────────────────────────────────────────┘   └──────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -407,16 +413,19 @@ bg?: string;                        // override background
 - Factual fields (usageType, install, links) deterministic from Phase 1 (never invented by director).
 - Result: director can't hallucinate features or fake URLs.
 
-### 6. **42-Primitive UI-Kit Registry (Organized by Category)**
-- Primitives organized: panels (3), charts (4), chrome (3), interaction (4), frames (2), dev (6), data-extra (6), surfaces (12).
+### 6. **52-Primitive UI-Kit Registry (Organized by Category)**
+- **Core 42 (v3):** panels (3), charts (4), chrome (3), interaction (4), frames (2), dev (6), data-extra (6), surfaces (12).
+- **v4 New: 10 Layout Templates:** split-hero, stacked-timeline, metric-banner, quote-card, before-after, device-mockup-trio, tab-switcher, map-pins, code-to-ui, feature-spotlight.
 - Director references by name; renderer dispatches via `UI_KIT` registry.
-- Storyboard schema enum validates names against `PRIMITIVE_NAMES`.
-- Modular: each primitive in its own .tsx file; easy to add/update.
+- Storyboard schema enum validates names against `PRIMITIVE_NAMES` (52 strings).
+- Modular: each primitive in its own .tsx file; templates in `templates.tsx`; easy to add/update.
 
-### 7. **Rich Motion & FX (v3 Aesthetic)**
-- `lib/motion.ts`: entrance variants (fade-up, scale, blur, clip, spring-pop, rise), countUp, typewriter, tilt3d, parallax.
-- `lib/fx.tsx`: DrawPath (SVG reveal), ShimmerSweep (glass), ScanLine (tech), ParticleBurst (beat), GlowPulse (halo).
-- Primitives layer motion + optional FX; deterministic frame-driven (no randomness).
+### 7. **Rich Motion & FX (v3 + v4 Enhancements)**
+- **v3:** entrance variants (fade-up, scale, blur, clip, spring-pop, rise), countUp, typewriter, tilt3d, parallax.
+- **v4:** stagger(), composeEnter() (fade∘slide∘parallax), parallaxY() (depth parallax), springEnter() (gentle spring).
+- **Text (v4):** AnimatedWords (word-by-word stagger), MaskedReveal (wipe-up, optional per-line colors).
+- `lib/fx.tsx`: DrawPath (SVG reveal), ShimmerSweep (glass), ScanLine (tech), ParticleBurst (beat), GlowPulse (halo). **v4:** Now opt-in only.
+- Primitives layer motion + optional FX; deterministic frame-driven (no randomness). Background near-flat (solid + static glow + grid, no frame animation).
 
 ### 8. **RenderBoundary Crash-Safety (v3 Robustness)**
 - Error boundary wraps every scene + element.
@@ -528,8 +537,8 @@ All readable JSON for debugging and re-use. v2 removed: `captures/` directory (n
 
 ## Summary
 
-AutoDemo v3 is a **two-stage human-gated pipeline** with 4 internal phases that reconstructs project UIs as animated vector primitives. **Stage A:** Analyze → Inspect → Build Brief (stops for approval). **Gate:** Human reviews/edits brief in server UI or CLI accepts `--yes`. **Stage B:** Approved Brief → Direct (Gemini picks flow template per usageType) → Render (Remotion + 42 motion-rich primitives + FX + RenderBoundary crash-safety).
+AutoDemo v4 is a **two-stage human-gated pipeline** with 4 internal phases that reconstructs project UIs as animated vector primitives. **Stage A:** Analyze → Inspect → Build Brief (stops for approval). **Gate:** Human reviews/edits brief in server UI or CLI accepts `--yes`. **Stage B:** Approved Brief → Direct (Gemini picks flow template per usageType, adapts storyboard to content richness, 45–60s) → Render (Remotion + 52 motion-rich primitives/templates + calm flat background + v4 motion core + FX + RenderBoundary crash-safety).
 
-**Accuracy anchors:** usageType + install + links deterministic (Phase 1, never invented); brief is human-approved contract; Director can't hallucinate. **Robustness:** RenderBoundary degrades malformed props gracefully. **Aesthetics:** 42-primitive registry with motion variants + FX layers (DrawPath, ShimmerSweep, ParticleBurst, GlowPulse). **Flexibility:** Configurable director model (AUTODEMO_DIRECTOR_MODEL env).
+**Accuracy anchors:** usageType + install + links deterministic (Phase 1, never invented); brief is human-approved contract; Director can't hallucinate. **Robustness:** RenderBoundary degrades malformed props gracefully. **Aesthetics:** 52-primitive registry (42 core + 10 templates) with stagger/composeEnter/parallaxY/springEnter motion + text word-stagger/masked-reveal; calm near-flat background (solid + static glow + grid); opt-in decorative FX. **Flexibility:** Adaptive scene budgeting per content richness; configurable director model (AUTODEMO_DIRECTOR_MODEL env).
 
-Result: token-efficient, accurate trailers that respect real design systems; offline-capable; editable storyboard JSON enables fast iteration without re-analyzing.
+Result: token-efficient, accurate, visually distinctive trailers (CLI vs dashboard vs content app tell different stories); offline-capable; calm backgrounds let motion-rich content shine; editable storyboard JSON enables fast iteration without re-analyzing.

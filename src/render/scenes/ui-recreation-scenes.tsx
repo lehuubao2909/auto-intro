@@ -3,12 +3,12 @@ import { AbsoluteFill, Sequence, useCurrentFrame } from "remotion";
 import type { Theme } from "../theme.js";
 import { TYPE } from "../theme.js";
 import { SceneFrame } from "../components/scene-frame.js";
-import { GlowPulse } from "../lib/fx.js";
 import { AnimatedLine } from "../components/animated-text.js";
 import { UI_KIT } from "../ui-kit/index.js";
 import { SidebarNav } from "../ui-kit/chrome.js";
 import { BentoGrid } from "../ui-kit/panels.js";
 import { entrance } from "../lib/timing.js";
+import { stagger, parallaxY } from "../lib/motion.js";
 import type { Scene } from "../../shared/storyboard-schema.js";
 
 type S<T extends Scene["type"]> = Extract<Scene, { type: T }>;
@@ -35,6 +35,22 @@ function renderEl(el: { primitive: string; props?: Record<string, unknown> }, th
   );
 }
 
+/** Subtle depth parallax: drifts its child slightly up over the scene (deeper = more drift). */
+const ParallaxLayer: React.FC<{ depth?: number; dur: number; amp?: number; children: React.ReactNode; style?: React.CSSProperties }> = ({
+  depth = 0.3,
+  dur,
+  amp = 26,
+  children,
+  style,
+}) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{ transform: `translateY(${-parallaxY(frame, dur, depth, amp)}px)`, willChange: "transform", ...style }}>
+      {children}
+    </div>
+  );
+};
+
 const Caption: React.FC<{ text?: string; theme: Theme }> = ({ text, theme }) =>
   text ? (
     <div style={{ position: "absolute", bottom: "6%", left: 0, right: 0, display: "flex", justifyContent: "center", textAlign: "center" }}>
@@ -52,11 +68,10 @@ const AppFrame: React.FC<{ theme: Theme; sidebar?: S<"ui-showcase">["sidebar"]; 
 
 export const UiShowcase: React.FC<{ scene: S<"ui-showcase">; theme: Theme }> = ({ scene, theme }) => (
   <SceneFrame theme={theme} durationInFrames={scene.durationInFrames} transitionIn={scene.transitionIn ?? "fade"} intensity={0.8} center>
-    <GlowPulse theme={theme} />
     <AppFrame theme={theme} sidebar={scene.sidebar}>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1 }}>
+      <ParallaxLayer depth={0.3} dur={scene.durationInFrames} style={{ display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1 }}>
         {renderEl(scene.element, theme, scene.sidebar ? 8 : 4)}
-      </div>
+      </ParallaxLayer>
     </AppFrame>
     <Caption text={scene.caption} theme={theme} />
   </SceneFrame>
@@ -67,7 +82,7 @@ export const UiBento: React.FC<{ scene: S<"ui-bento">; theme: Theme }> = ({ scen
     <AppFrame theme={theme} sidebar={scene.sidebar}>
       <BentoGrid theme={theme} cols={scene.cols ?? 3}>
         {scene.tiles.map((t, i) => (
-          <div key={i} style={{ minHeight: 0 }}>{renderEl(t, theme, (scene.sidebar ? 8 : 4) + i * 3)}</div>
+          <div key={i} style={{ minHeight: 0 }}>{renderEl(t, theme, stagger(i, scene.sidebar ? 8 : 4, 4))}</div>
         ))}
       </BentoGrid>
     </AppFrame>

@@ -1,10 +1,12 @@
 /**
  * Central config — defaults + env overrides. KISS: plain object, no framework.
  *
- * LLM provider is Gemini everywhere (locked decision):
- *   - Director  = gemini-3.5-flash      (storyboard synthesis; strongest for our budget)
- *   - Triage    = gemini-3.1-flash-lite (cheap long-context skim of repo files)
- * Override any value via env without code changes.
+ * LLM provider is pluggable — Gemini (default), OpenAI, or Anthropic. Each has a
+ * researched default Director (storyboard synthesis) + Triage (cheap repo skim) model;
+ * override the provider and either model via env without code changes:
+ *   AUTOINTRO_PROVIDER = gemini | openai | anthropic
+ *   AUTOINTRO_DIRECTOR_MODEL / AUTOINTRO_TRIAGE_MODEL (optional per-model overrides)
+ * Keys: GEMINI_API_KEY/GOOGLE_API_KEY · OPENAI_API_KEY · ANTHROPIC_API_KEY.
  */
 
 // Load a local .env if present (Node 20.12+ has process.loadEnvFile). Best-effort.
@@ -25,11 +27,47 @@ function envInt(key: string, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+// --- LLM provider selection ------------------------------------------------
+export type LlmProvider = "gemini" | "openai" | "anthropic";
+
+/**
+ * Researched per-provider defaults (mid-2026). Director = strongest reasonable for
+ * structured storyboard JSON; Triage = cheap/fast long-context skim.
+ *  - gemini: 3.5-flash / 3.1-flash-lite
+ *  - openai: gpt-5.4 (mid frontier) / gpt-5.4-mini (cheap)
+ *  - anthropic: claude-opus-4-8 (most capable) / claude-haiku-4-5 (fastest, cheapest)
+ */
+const PROVIDER_DEFAULTS: Record<LlmProvider, { director: string; triage: string }> = {
+  gemini: { director: "gemini-3.5-flash", triage: "gemini-3.1-flash-lite" },
+  openai: { director: "gpt-5.4", triage: "gpt-5.4-mini" },
+  anthropic: { director: "claude-opus-4-8", triage: "claude-haiku-4-5" },
+};
+
+const rawProvider = env("AUTOINTRO_PROVIDER", "gemini").toLowerCase();
+const provider: LlmProvider = (["gemini", "openai", "anthropic"] as const).includes(rawProvider as LlmProvider)
+  ? (rawProvider as LlmProvider)
+  : "gemini";
+
+const PROVIDER_KEY: Record<LlmProvider, string> = {
+  gemini: process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? "",
+  openai: process.env.OPENAI_API_KEY ?? "",
+  anthropic: process.env.ANTHROPIC_API_KEY ?? "",
+};
+
+const KEY_HELP: Record<LlmProvider, { envVar: string; url: string }> = {
+  gemini: { envVar: "GEMINI_API_KEY", url: "https://aistudio.google.com/apikey" },
+  openai: { envVar: "OPENAI_API_KEY", url: "https://platform.openai.com/api-keys" },
+  anthropic: { envVar: "ANTHROPIC_API_KEY", url: "https://console.anthropic.com/settings/keys" },
+};
+
+const defaults = PROVIDER_DEFAULTS[provider];
+
 export const config = {
-  gemini: {
-    apiKey: process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? "",
-    directorModel: env("AUTOINTRO_DIRECTOR_MODEL", "gemini-3.5-flash"),
-    triageModel: env("AUTOINTRO_TRIAGE_MODEL", "gemini-3.1-flash-lite"),
+  llm: {
+    provider,
+    apiKey: PROVIDER_KEY[provider],
+    directorModel: env("AUTOINTRO_DIRECTOR_MODEL", defaults.director),
+    triageModel: env("AUTOINTRO_TRIAGE_MODEL", defaults.triage),
   },
   video: {
     fps: envInt("AUTOINTRO_FPS", 30),
@@ -53,11 +91,13 @@ export const config = {
 
 export type AppConfig = typeof config;
 
-export function assertGeminiKey(): void {
-  if (!config.gemini.apiKey) {
+/** Assert the ACTIVE provider has its API key set; otherwise a clear, provider-aware error. */
+export function assertLlmKey(): void {
+  if (!config.llm.apiKey) {
+    const { envVar, url } = KEY_HELP[config.llm.provider];
     throw new Error(
-      "Missing GEMINI_API_KEY. Set it in your environment (or a .env file) to run analysis + director. " +
-        "Get a key at https://aistudio.google.com/apikey",
+      `Missing ${envVar} for AUTOINTRO_PROVIDER="${config.llm.provider}". ` +
+        `Set it in your environment (or a .env file) to run analysis + director. Get a key at ${url}`,
     );
   }
 }

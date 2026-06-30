@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { generateJson } from "../shared/gemini-client.js";
+import { generateJson } from "../shared/llm-client.js";
 import { config } from "../shared/config.js";
 import { ProjectBrief, type RepoFacts, type ProjectBrief as Brief, type UsageType } from "../shared/types.js";
 
@@ -47,7 +47,7 @@ export async function buildBrief(facts: RepoFacts): Promise<Brief> {
       suggestedBeats: gen.suggestedBeats,
     });
 
-  if (!config.gemini.apiKey) {
+  if (!config.llm.apiKey) {
     return assemble({ oneLiner: facts.identity, howItsUsed: fallbackHowUsed(facts), keyFeatures: facts.features.slice(0, 6), suggestedBeats: [] });
   }
 
@@ -63,7 +63,7 @@ export async function buildBrief(facts: RepoFacts): Promise<Brief> {
   ].join("\n");
 
   try {
-    const gen = await generateJson(prompt, BriefGen, { model: config.gemini.directorModel, temperature: 0.4, useResponseSchema: false });
+    const gen = await generateJson(prompt, BriefGen, { model: config.llm.directorModel, temperature: 0.4, useResponseSchema: false });
     return assemble(gen);
   } catch {
     return assemble({ oneLiner: facts.identity, howItsUsed: fallbackHowUsed(facts), keyFeatures: facts.features.slice(0, 6), suggestedBeats: [] });

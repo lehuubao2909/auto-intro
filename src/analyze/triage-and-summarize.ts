@@ -3,12 +3,12 @@ import { z } from "zod";
 import type { RepoTree, RepoFile } from "./walk-repo.js";
 import { scrubSecrets } from "./scrub-secrets.js";
 import { readJsonSafe } from "./read-json-safe.js";
-import { generateJson } from "../shared/gemini-client.js";
+import { generateJson } from "../shared/llm-client.js";
 import { config } from "../shared/config.js";
 
 /**
  * Triage: pick the few most informative files (README + manifest + entry sources),
- * scrub secrets, and ask Gemini (triage model) for the narrative facts. Falls back
+ * scrub secrets, and ask the LLM (triage model) for the narrative facts. Falls back
  * to a deterministic summary (package.json + README) when no API key is present.
  */
 
@@ -59,7 +59,7 @@ function buildBundle(files: RepoFile[]): string {
   return parts.join("\n\n");
 }
 
-/** Deterministic fallback when Gemini is unavailable. */
+/** Deterministic fallback when no LLM provider is available. */
 function fallbackSummary(tree: RepoTree): RepoSummary {
   const pkgFile = tree.files.find((f) => f.relPath === "package.json");
   const pkg = pkgFile ? readJsonSafe<{ name?: string; description?: string }>(pkgFile.absPath) : null;
@@ -84,7 +84,7 @@ function fallbackSummary(tree: RepoTree): RepoSummary {
 }
 
 export async function triageAndSummarize(tree: RepoTree): Promise<RepoSummary> {
-  if (!config.gemini.apiKey) return fallbackSummary(tree);
+  if (!config.llm.apiKey) return fallbackSummary(tree);
 
   const bundle = buildBundle(pickTriageFiles(tree));
   const prompt = [
@@ -100,7 +100,7 @@ export async function triageAndSummarize(tree: RepoTree): Promise<RepoSummary> {
   ].join("\n");
 
   try {
-    return await generateJson(prompt, RepoSummary, { model: config.gemini.triageModel, temperature: 0.2 });
+    return await generateJson(prompt, RepoSummary, { model: config.llm.triageModel, temperature: 0.2 });
   } catch {
     return fallbackSummary(tree);
   }

@@ -4,7 +4,7 @@
 
 A **local-first CLI tool** that transforms any code repository into a **45–60 second "code trailer"** — a professional motion-graphics video showing **recreated UI (idealized, NeuraFlow-style with rich motion/FX)**, animated text, tech stack, and architecture — rendered locally as `.mp4`, no voiceover.
 
-**v3 Key Pivot:** Human-gated two-stage pipeline (analyze → brief → **human review** → approve → render). Increases accuracy (LLM narrative grounded in deterministic facts) and enables token-saving (brief approved once, director doesn't re-analyze). Support for 8 usage types (cli, sdk, library, web-app, api, mobile, desktop) with type-specific flow templates. 42 UI-kit primitives (up from 14) with rich motion variants + FX layers + crash-safety.
+**v3 Key Pivot:** Human-gated two-stage pipeline (analyze → brief → **human review** → approve → render). Increases accuracy (LLM narrative grounded in deterministic facts) and enables token-saving (brief approved once, director doesn't re-analyze). Support for 8 usage types (cli, sdk, library, web-app, api, mobile, desktop) with type-specific flow templates. 42 UI-kit primitives (up from 14) with rich motion variants + FX layers + crash-safety. **v4 Enhancements:** 52 primitives (42 core + 10 layout templates); calm near-flat background (solid + static glow + grid, no frame-animation); v4 motion core (stagger, composeEnter, parallaxY, springEnter); text word-stagger/masked-reveal; adaptive director (content richness drives 45–60s length + scene budget); decorative FX opt-in only.
 
 ```bash
 npx autodemo [repoPath]
@@ -49,9 +49,9 @@ Developers struggle to showcase code projects compellingly:
 
 ### 4. **Comprehension-First (Show, Don't Tell)**
 - A trailer **fails** if viewers can't answer: *What is it? What problem? What does it do? How? What tech? Why care?*
-- **Recreated UI is the hero** — idealized vector primitives (42 types) built from project design system.
+- **Recreated UI is the hero** — idealized vector primitives (52 types) built from project design system.
 - Text & graphics are supporting acts; code snippets optional (spice, not course).
-- **v3 benefit:** Rich motion (enter variants, FX layers: particles, shimmer, glow, scan-lines) + crash-safe rendering.
+- **v3 benefit:** Rich motion (enter variants, FX layers: particles, shimmer, glow, scan-lines) + crash-safe rendering. **v4:** Calm near-flat background lets UI shine; stagger/depth-parallax for UI layers; text word-stagger/masked-reveal; decorative FX opt-in only.
 
 ### 5. **Deterministic**
 - Storyboard JSON is the single source of truth (zod schema = contract).
@@ -83,15 +83,15 @@ Developers struggle to showcase code projects compellingly:
 | **LLM (Triage)** | Gemini gemini-3.1-flash-lite (repo analysis, cheap long-context) |
 | **UsageType Detection** | Deterministic: package.json parsing, bin entries, framework deps (no LLM) |
 | **Design Extraction** | Regex-based (CSS vars, Tailwind, SVG brand detection) — no runtime |
-| **Component Classification** | Gemini (map source components to 42 UI-kit primitives) or fallback heuristic |
-| **UI Rendering** | **42 animated vector primitives** (panels 3, charts 4, chrome 3, interaction 4, frames 2, dev 6, data-extra 6, surfaces 12) with motion variants + FX |
-| **Motion & FX** | `lib/motion.ts` (enter variants, countUp, typewriter, tilt3d, parallax) + `lib/fx.tsx` (DrawPath, ShimmerSweep, ScanLine, ParticleBurst, GlowPulse) |
+| **Component Classification** | Gemini (map source components to 52 UI-kit primitives) or fallback heuristic |
+| **UI Rendering** | **52 animated vector primitives** (42 core: panels 3, charts 4, chrome 3, interaction 4, frames 2, dev 6, data-extra 6, surfaces 12; + 10 templates: split-hero, stacked-timeline, metric-banner, quote-card, before-after, device-mockup-trio, tab-switcher, map-pins, code-to-ui, feature-spotlight) with motion variants + FX |
+| **Motion & FX** | **v4:** `lib/motion.ts` (stagger, composeEnter, parallaxY, springEnter, countUp, typewriter, tilt3d) + `lib/fx.tsx` (DrawPath, ShimmerSweep, ScanLine, ParticleBurst, GlowPulse — opt-in); **v4 text:** AnimatedWords (word-stagger), MaskedReveal (wipe-up). **v4 bg:** Near-flat (solid + static glow + grid). |
 | **Crash-Safety** | RenderBoundary error boundary (scene + element level); degrades malformed props gracefully |
 | **Video Render** | Remotion + React (deterministic, composable, ESM) |
 | **Server** | Fastify + SSE for progress + static UI; two-stage gate routes: POST /api/analyze, GET/POST /api/brief, POST /api/approve |
 | **Language** | TypeScript ESM (Node 20+) |
 
-**v3 Architecture:** Two-stage human-gated pipeline (brief review before render). Deterministic usageType detection (no LLM). 42-primitive registry with rich motion/FX. Configurable director model. RenderBoundary crash-safety.
+**v3+v4 Architecture:** Two-stage human-gated pipeline (brief review before render). Deterministic usageType detection (no LLM). **v4:** 52-primitive registry (42 core + 10 templates); calm near-flat background; v4 motion core (stagger, composeEnter, parallaxY, springEnter); text word-stagger/masked-reveal; adaptive director (content richness → 45–60s length + scene budget); decorative FX opt-in. Configurable director model. RenderBoundary crash-safety.
 
 ---
 
@@ -158,13 +158,13 @@ See `./docs/system-architecture.md` for the full schema and validation rules.
 - [x] Two-stage gate: POST /api/analyze (stage A) → brief review → POST /api/approve (stage B).
 - [x] Analyze repo: detect tech stack, runnable (npm scripts, live URL), **usageType** (8 types).
 - [x] Build brief: LLM narrative (oneLiner, howItsUsed, beats) + deterministic facts (usageType, install, links).
-- [x] Inspect UI: extract design profile (CSS/Tailwind/brand), classify components to 42 primitives.
-- [x] Direct storyboard: Gemini composes UI-kit scenes per **flow template** (usageType-specific), with repair loop.
-- [x] Render trailer: Remotion renders **42 primitives** with **motion variants** + **FX** + theme, to `.mp4`.
+- [x] Inspect UI: extract design profile (CSS/Tailwind/brand), classify components to 52 primitives.
+- [x] Direct storyboard: Gemini composes UI-kit scenes per **flow template** (usageType-specific), **v4:** adaptive per content richness (45–60s, scene budget), explicit pacing, with repair loop.
+- [x] Render trailer: Remotion renders **52 primitives** (42 core + 10 templates) with **v4 motion** (stagger, composeEnter, parallaxY, springEnter) + **text animation** (word-stagger, masked-reveal) + **calm BG** + **optional FX** + theme, to `.mp4`.
 - [x] RenderBoundary: error boundary wraps scenes/elements; malformed props degrade gracefully.
 - [x] Web UI: single-page (HTML + SSE progress), brief review panel, storyboard preview + download + edit + re-render.
 - [x] Validate storyboard: structural (zod) + quality rules (beats, reading floor, SFX budget, etc.).
-- [x] Per-project theming: DesignProfile extracted; all primitives themed from it.
+- [x] Per-project theming: DesignProfile extracted; all primitives themed from it. **v4:** Calm near-flat background + static glow + grid.
 
 ### Non-Functional
 - [x] Accuracy-first: usageType deterministic (no LLM guess); brief human-approved; director can't invent links.
@@ -176,11 +176,11 @@ See `./docs/system-architecture.md` for the full schema and validation rules.
 - [x] Configurable director model (AUTODEMO_DIRECTOR_MODEL env).
 - [x] Token-efficient: brief approved once; director reuses (no re-analysis per repair attempt).
 
-### Out-of-Scope (v3)
-- [ ] Audio / music sync (placeholders ready; deferred to v4).
+### Out-of-Scope (v3 / Deferred)
+- [ ] Audio / music sync (placeholders ready; deferred to future).
 - [ ] Multi-job queue (single-job model).
 - [ ] Live UI capture / dynamic interaction (uses source design + structure only).
-- [ ] Custom scene components (fixed scene types + 42 primitives).
+- [ ] Custom scene components (fixed scene types + 52 primitives; extensible via templates.tsx).
 
 ---
 
@@ -195,8 +195,8 @@ See `./docs/system-architecture.md` for the full schema and validation rules.
 
 ## Summary
 
-AutoDemo v3 is an **accuracy-first, local-first trailer generator** that solves the "hard to demo code" problem by **recreating idealized UI** from source design systems with a **human-in-the-loop approval gate**. Pipeline: analyze (detect usageType) → build brief → **review gate** → direct (flow template per type) → render (42 motion-rich primitives + FX + crash-safety).
+AutoDemo v4 is an **accuracy-first, local-first, motion-first trailer generator** that solves the "hard to demo code" problem by **recreating idealized UI** from source design systems with a **human-in-the-loop approval gate**. Pipeline: analyze (detect usageType) → build brief → **review gate** → direct (flow template per type, adaptive to content richness, 45–60s) → render (52 motion-rich primitives/templates + calm flat background + v4 motion core + optional FX + crash-safety).
 
-**Key v3 advances:** Deterministic usageType (cli/sdk/api/web-app/mobile/etc.) drives flow templates. Human-approved brief anchors accuracy (LLM can't invent features/links). Configurable director model (AUTODEMO_DIRECTOR_MODEL). 42 UI-kit primitives (up from 14) with motion variants + FX layers (ShimmerSweep, ParticleBurst, etc.). RenderBoundary crash-safety (graceful degradation on bad LLM props). Token-efficient (brief approved once). Local-first, open-source-ready, self-hostable.
+**v3 advances:** Deterministic usageType (cli/sdk/api/web-app/mobile/etc.) drives flow templates. Human-approved brief anchors accuracy. Configurable director model. 42 UI-kit primitives with motion/FX. RenderBoundary crash-safety. Token-efficient. **v4 enhancements:** +10 layout-template primitives (52 total); calm near-flat background (solid + static glow + grid, no frame-animation); v4 motion core (stagger, composeEnter, parallaxY, springEnter); text word-stagger/masked-reveal; adaptive director (content richness → scene count + length band); decorative FX opt-in only; visually distinct trailers per project type (CLI vs dashboard vs content app).
 
-**Status:** v3 production-ready. 319 tests passing. Ready for community use + self-hosting.
+**Status:** v4 shipped. 329 tests passing (up from 319). Ready for production use.
